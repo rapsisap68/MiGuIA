@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimiento Plateado: Visión de Instituciones Nueva Longevidad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- 
+    Narrative & Structure Plan:
+    1. Title & Hook: Introduce "New Longevity" with a key aging statistic.
+    2. Section 1 (Global Landscape): Use a map to show the global nature of aging initiatives.
+    3. Section 2 (Pilar 1: Education): Visualize educational models (U3A, OLLI) using bar and donut charts, and an HTML/CSS diagram.
+    4. Section 3 (Pilar 2: Geroscience): Visualize research institutions (NIA, TGN) using a bubble chart and an HTML/CSS process flow diagram.
+    5. Section 4 (Trends & Challenges): Use styled cards to highlight key takeaways.
+    6. Conclusion: Summarize the integrated vision of education and science for a better, longer life.
+
+    Visualization Choices (NO SVG, NO MERMAID JS):
+    - Global Aging Stat -> Single Big Number -> HTML/Tailwind for impact.
+    - Global Initiatives -> Map Chart -> Plotly.js (scattergeo, WebGL rendering) for geographic context. NO SVG.
+    - Educational Models -> Bar Chart -> Chart.js for comparing distinct categories. NO SVG.
+    - Program Focus -> Donut Chart -> Chart.js for showing composition. NO SVG.
+    - U3A Models -> Flow Chart -> HTML/CSS with Tailwind for a clear structural comparison. NO SVG. NO MERMAID.
+    - Research Institutions -> Bubble Chart -> Chart.js for showing relationships and relative scale. NO SVG.
+    - Geroscience Pipeline -> Flow Chart -> HTML/CSS with Tailwind for process visualization. NO SVG. NO MERMAID.
+    - Trends/Challenges -> Styled Cards -> HTML/Tailwind for organized, readable content. NO SVG.
+    
+    Color Palette: Brilliant Blues (#F1F7FE, #2176FF, #33A1FD, #FDCA40, #0D1F2D)
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F1F7FE;
+            color: #0D1F2D;
+        }
+        .kpi-number {
+            font-weight: 900;
+            color: #2176FF;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 900;
+            line-height: 2.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.125rem;
+            text-align: center;
+            max-width: 48rem;
+            margin-left: auto;
+            margin-right: auto;
+            color: #4A5568;
+            margin-bottom: 3rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            height: 100%;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #2176FF;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="text-center py-12 px-4 bg-white">
+        <h1 class="text-4xl md:text-6xl font-black text-gray-900 leading-tight">Movimiento Plateado: Visión de Instituciones Nueva Longevidad</h1>
+        <p class="mt-4 text-xl md:text-2xl text-blue-600 font-bold">Por: Ramiro A Paniagua G de Movimiento Plateado</p>
+        <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-600">
+            El mundo vive una transformación demográfica sin precedentes. Más allá de vivir más años, el desafío es vivir mejor. La "Nueva Longevidad" se construye sobre dos pilares: el empoderamiento a través del aprendizaje continuo y la revolución de la gerociencia para extender nuestros años de vida saludable.
+        </p>
+    </header>
+
+    <main class="container mx-auto px-4 py-12">
+
+        <section id="global-landscape" class="mb-20">
+            <h2 class="section-title">Un Fenómeno Global</h2>
+            <p class="section-subtitle">
+                El envejecimiento poblacional no es una tendencia regional, sino una realidad mundial. Desde Norteamérica hasta Asia y Europa, las naciones están desarrollando estrategias innovadoras para transformar este cambio demográfico en una oportunidad.
+            </p>
+            <div class="card">
+                <div id="mapChart" class="w-full h-[60vh]"></div>
+                 <p class="text-center text-sm text-gray-500 mt-2">Puntos de interés que indican la ubicación de instituciones y programas clave de longevidad y educación para personas mayores mencionados en los informes.</p>
+            </div>
+        </section>
+
+        <section id="education-pillar" class="mb-20">
+            <h2 class="section-title">Pilar 1: Empoderamiento a Través del Aprendizaje</h2>
+            <p class="section-subtitle">
+                Mantenerse activo, comprometido y en constante aprendizaje es clave para una vida plena. En todo el mundo, diversos modelos educativos están surgiendo para satisfacer las necesidades de las "personas plateadas", enfocándose no solo en el conocimiento, sino también en la conexión social y el bienestar.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+                <div class="card text-center p-8">
+                    <p class="text-6xl kpi-number">1,000+</p>
+                    <p class="mt-2 text-lg font-bold">Cursos Ofrecidos</p>
+                    <p class="text-gray-600">Por la National Silver Academy (NSA) de Singapur, demostrando un fuerte apoyo gubernamental al aprendizaje continuo.</p>
+                </div>
+                <div class="card text-center p-8">
+                    <p class="text-6xl kpi-number">400K</p>
+                    <p class="mt-2 text-lg font-bold">Miembros Activos</p>
+                    <p class="text-gray-600">En la red "u3a" del Reino Unido, un modelo de éxito basado en el aprendizaje entre pares y la auto-organización.</p>
+                </div>
+                <div class="card text-center p-8">
+                    <p class="text-6xl kpi-number">150+</p>
+                    <p class="mt-2 text-lg font-bold">Clases de Informática</p>
+                    <p class="text-gray-600">Ofrecidas por SeniorNet, combatiendo la brecha digital con un exitoso modelo de "seniors enseñando a seniors".</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-center">Comparativa de Modelos Educativos</h3>
+                    <p class="text-center text-gray-600 mb-4">Existen múltiples enfoques para el aprendizaje en la tercera edad, desde programas universitarios hasta iniciativas comunitarias y nacionales.</p>
+                    <div class="chart-container">
+                        <canvas id="modelsChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                     <h3 class="text-xl font-bold mb-4 text-center">Focos Principales de los Programas</h3>
+                     <p class="text-center text-gray-600 mb-4">Más allá de lo académico, estos programas buscan un desarrollo integral de la persona.</p>
+                    <div class="chart-container">
+                        <canvas id="focusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="colombia-case" class="mb-20">
+            <h2 class="section-title">Caso Colombia: Movimiento Plateado</h2>
+            <p class="section-subtitle">
+                En Colombia, el "Movimiento Plateado" emerge como una iniciativa clave para destacar la relevancia y el potencial de las personas mayores en la sociedad. Este movimiento busca promover la participación activa, el bienestar y el reconocimiento de esta población.
+            </p>
+            <div class="card text-center p-8">
+                <p class="text-4xl font-bold text-blue-600">Conoce Más:</p>
+                <a href="https://movimientoplateado.com/" target="_blank" class="mt-4 inline-block bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
+                    www.movimientoplateado.com
+                </a>
+                <p class="mt-4 text-sm text-gray-600">Un espacio para la comunidad plateada en Colombia.</p>
+            </div>
+        </section>
+
+        <section id="llm-advice-section" class="mb-20">
+            <h2 class="section-title">Consejo Inteligente para la Longevidad ✨</h2>
+            <p class="section-subtitle">
+                Explora el poder de la IA para obtener consejos personalizados sobre cómo vivir una vida plateada más plena. Escribe una idea, un interés o una pregunta y descubre nuevas perspectivas.
+            </p>
+            <div class="card p-8 flex flex-col items-center">
+                <textarea id="longevityPrompt" class="w-full max-w-xl p-4 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 mb-4 text-gray-700" rows="4" placeholder="Ej: ¿Cómo puedo mantenerme activo mentalmente después de la jubilación? ¿Qué actividades recomiendas para socializar en la tercera edad?"></textarea>
+                <button id="generateAdviceBtn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center">
+                    Generar Consejo ✨
+                    <div id="loadingSpinner" class="loading-spinner ml-2"></div>
+                </button>
+                <div id="adviceOutput" class="mt-6 w-full max-w-xl p-4 bg-blue-50 border border-blue-200 rounded-lg text-gray-800 hidden">
+                    <p class="font-semibold mb-2">Tu consejo personalizado:</p>
+                    <p id="adviceText"></p>
+                </div>
+                 <div id="errorMessage" class="mt-4 w-full max-w-xl p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden">
+                    <p>Ocurrió un error al generar el consejo. Por favor, inténtalo de nuevo más tarde.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="geroscience-pillar" class="mb-20">
+            <h2 class="section-title">Pilar 2: La Revolución de la Gerociencia</h2>
+            <p class="section-subtitle">
+                La ciencia moderna está cambiando el paradigma: en lugar de tratar enfermedades individuales, la gerociencia busca entender y actuar sobre los mecanismos biológicos del envejecimiento para prevenir múltiples dolencias a la vez y extender nuestra "esperanza de vida saludable" (healthspan).
+            </p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-center">Ecosistema de Investigación en Longevidad</h3>
+                    <p class="text-center text-gray-600 mb-4">Instituciones líderes colaboran en una red global para descifrar los secretos de un envejecimiento saludable. El tamaño de la burbuja representa su enfoque e impacto en el ecosistema.</p>
+                    <div class="chart-container">
+                        <canvas id="researchBubbleChart"></canvas>
+                    </div>
+                </div>
+                 <div class="card">
+                    <h3 class="text-xl font-bold mb-4 text-center">El Camino de la Gerociencia: De la Idea a la Intervención</h3>
+                     <p class="text-center text-gray-600 mb-4">La investigación traslacional es un proceso estructurado que lleva los descubrimientos del laboratorio a beneficios tangibles para la sociedad.</p>
+                    <div class="space-y-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-500 text-white rounded-full h-12 w-12 flex items-center justify-center font-black text-xl">1</div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Investigación Básica</h4>
+                                <p class="text-gray-600">Estudio de mecanismos moleculares y genéticos. (Ej: MiniAging, NECS)</p>
+                            </div>
+                        </div>
+                        <div class="h-8 border-l-4 border-blue-300 border-dashed ml-6"></div>
+                        <div class="flex items-center">
+                             <div class="flex-shrink-0 bg-blue-500 text-white rounded-full h-12 w-12 flex items-center justify-center font-black text-xl">2</div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Redes Traslacionales</h4>
+                                <p class="text-gray-600">Aceleran la traducción de hallazgos a ensayos clínicos. (Ej: TGN)</p>
+                            </div>
+                        </div>
+                        <div class="h-8 border-l-4 border-blue-300 border-dashed ml-6"></div>
+                        <div class="flex items-center">
+                             <div class="flex-shrink-0 bg-blue-500 text-white rounded-full h-12 w-12 flex items-center justify-center font-black text-xl">3</div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Intervenciones Clínicas</h4>
+                                <p class="text-gray-600">Pruebas en humanos, a menudo con fármacos reutilizados. (Ej: Ensayos con senolíticos)</p>
+                            </div>
+                        </div>
+                        <div class="h-8 border-l-4 border-blue-300 border-dashed ml-6"></div>
+                        <div class="flex items-center">
+                             <div class="flex-shrink-0 bg-yellow-400 text-gray-900 rounded-full h-12 w-12 flex items-center justify-center font-black text-xl">4</div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-bold">Política y Educación Pública</h4>
+                                <p class="text-gray-600">Traducción de la ciencia en políticas y conciencia social. (Ej: ILC Global Alliance)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="trends-challenges" class="mb-20">
+            <h2 class="section-title">Tendencias y Desafíos Clave</h2>
+            <p class="section-subtitle">
+                El camino hacia una nueva longevidad es prometedor, pero no está exento de obstáculos. La tecnología y la colaboración abren nuevas puertas, mientras que barreras sociales y estructurales deben ser superadas.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card border-t-4 border-green-400">
+                    <h3 class="text-xl font-bold mb-2">📈 Tendencia: Diversidad de Modelos</h3>
+                    <p class="text-gray-600">Desde el modelo académico francés de U3A hasta la autoayuda británica, la personalización es clave. No hay una solución única; la flexibilidad para adaptarse a diferentes motivaciones y contextos culturales es fundamental para el éxito.</p>
+                </div>
+                <div class="card border-t-4 border-green-400">
+                    <h3 class="text-xl font-bold mb-2">📈 Tendencia: Tecnología Catalizadora</h3>
+                    <p class="text-gray-600">Plataformas virtuales (Zoom, etc.) y la telemedicina están rompiendo barreras geográficas y de movilidad, democratizando el acceso tanto a la educación como a la atención médica para una población mayor cada vez más amplia.</p>
+                </div>
+                <div class="card border-t-4 border-red-400">
+                    <h3 class="text-xl font-bold mb-2">⚠️ Desafío: Edadismo Persistente</h3>
+                    <p class="text-gray-600">El prejuicio basado en la edad sigue siendo una barrera significativa, limitando el acceso a oportunidades laborales y de aprendizaje, y afectando la confianza de las personas mayores en su capacidad para adquirir nuevas habilidades.</p>
+                </div>
+                <div class="card border-t-4 border-red-400">
+                    <h3 class="text-xl font-bold mb-2">⚠️ Desafío: Equidad en el Acceso</h3>
+                    <p class="text-gray-600">La brecha digital y las desigualdades socioeconómicas pueden excluir a los más vulnerables. Garantizar que los beneficios de la educación y la ciencia lleguen a todos, independientemente de su origen o ubicación, es un reto crítico.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white text-center py-8 mt-16">
+        <p class="font-bold">Un Futuro Integrado</p>
+        <p class="max-w-3xl mx-auto mt-2 text-gray-300">
+            La Nueva Longevidad no se logrará solo en los laboratorios ni solo en las aulas. Requiere una sinergia entre la ciencia que extiende la vida saludable y la educación que le da propósito y significado.
+        </p>
+        <div class="mt-4 flex flex-col items-center">
+            <div class="flex items-center space-x-4 mb-2">
+                <a href="https://movimientoplateado.com/" target="_blank" class="text-blue-400 hover:underline">www.MovimientoPlateado.com</a>
+                <span>-</span>
+                <a href="https://www.linkedin.com/in/ramiropaniagua" target="_blank" class="text-blue-400 hover:underline">Ramiro A Paniagua G</a>
+            </div>
+            <div class="flex space-x-6 mb-4">
+                <a href="https://www.facebook.com/profile.php?id=61573086449893" target="_blank" class="text-blue-400 hover:text-blue-300 text-3xl">📘</a>
+                <a href="https://www.youtube.com/@MovimientoPlateado" target="_blank" class="text-blue-400 hover:text-blue-300 text-3xl">▶️</a>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4">
+                <div class="flex flex-col items-center">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://movimientoplateado.com/" alt="QR Movimiento Plateado" class="rounded-md">
+                    <span class="text-xs mt-1 text-gray-300">Movimiento Plateado</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.linkedin.com/in/ramiropaniagua" alt="QR Ramiro Paniagua" class="rounded-md">
+                    <span class="text-xs mt-1 text-gray-300">Ramiro Paniagua</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.facebook.com/profile.php?id=61573086449893" alt="QR Club Plateado Facebook" class="rounded-md">
+                    <span class="text-xs mt-1 text-gray-300">Club Plateado (FB)</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.youtube.com/@MovimientoPlateado" alt="QR Movimiento Plateado YouTube" class="rounded-md">
+                    <span class="text-xs mt-1 text-gray-300">Movimiento Plateado (YT)</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const wrapLabel = (label) => {
+            const maxLength = 16;
+            if (label.length <= maxLength) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > maxLength) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            }
+            if (currentLine) {
+                lines.push(currentLine.trim());
+            }
+            return lines;
+        };
+        
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            }
+            return label;
+        };
+
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    }
+                }
+            },
+             scales: {
+                x: {
+                    ticks: { color: '#0D1F2D' },
+                    grid: { display: false }
+                },
+                y: {
+                    ticks: { color: '#0D1F2D' },
+                    grid: { color: '#E0E0E0' }
+                }
+            }
+        };
+
+        const colors = {
+            primaryBlue: '#2176FF',
+            secondaryBlue: '#33A1FD',
+            accentYellow: '#FDCA40',
+            darkText: '#0D1F2D',
+            lightBlue: '#A8D5FF',
+            extraLight: '#F1F7FE'
+        };
+        
+        const mapLocations = [
+            { name: 'EE. UU.', lat: 39.8283, lon: -98.5795, text: 'NIA, TGN, OLLI, NECS' },
+            { name: 'España', lat: 40.4168, lon: -3.7038, text: 'MiniAging, Cátedra IDEA' },
+            { name: 'Singapur', lat: 1.3521, lon: 103.8198, text: 'National Silver Academy' },
+            { name: 'Reino Unido', lat: 55.3781, lon: -3.4360, text: 'u3a Network' },
+            { name: 'Chile', lat: -35.6751, lon: -71.5430, text: 'Programa Aprende Mayor' },
+            { name: 'Francia', lat: 46.2276, lon: 2.2137, text: 'Origen de U3A' },
+            { name: 'Kazajistán', lat: 48.0196, lon: 66.9237, text: 'Silver Universities' },
+            { name: 'Japón', lat: 36.2048, lon: 138.2529, text: 'SeniorNet' },
+        ];
+        
+        const mapData = [{
+            type: 'scattergeo',
+            mode: 'markers+text',
+            lat: mapLocations.map(l => l.lat),
+            lon: mapLocations.map(l => l.lon),
+            text: mapLocations.map(l => l.name),
+            hovertext: mapLocations.map(l => l.text),
+            hoverinfo: 'text',
+            marker: {
+                color: colors.primaryBlue,
+                size: 10,
+                line: {
+                    color: 'white',
+                    width: 1
+                }
+            },
+            textfont: {
+                family: 'Inter, sans-serif',
+                size: 12,
+                color: colors.darkText
+            },
+            textposition: 'top right'
+        }];
+
+        const mapLayout = {
+            title: 'Iniciativas Clave en Longevidad y Educación',
+            font: { family: 'Inter, sans-serif' },
+            geo: {
+                scope: 'world',
+                projection: { type: 'mercator' },
+                showland: true,
+                landcolor: '#EBF8FF',
+                subunitwidth: 1,
+                subunitcolor: '#FFFFFF',
+                countrywidth: 1,
+                countrycolor: '#FFFFFF',
+                showlakes: true,
+                lakecolor: '#FFFFFF',
+            },
+            margin: { l: 0, r: 0, t: 40, b: 0 }
+        };
+
+        Plotly.newPlot('mapChart', mapData, mapLayout, {responsive: true});
+
+
+        const modelsCtx = document.getElementById('modelsChart').getContext('2d');
+        const modelsData = {
+            labels: ['U3A (Autoayuda)', 'U3A (Académico)', 'OLLI (EE.UU.)', 'Iniciativas Nacionales', 'Alfabetización Digital'].map(wrapLabel),
+            datasets: [{
+                label: 'Alcance e Impacto Relativo',
+                data: [85, 70, 75, 90, 65],
+                backgroundColor: [
+                    'rgba(33, 118, 255, 0.7)',
+                    'rgba(51, 161, 253, 0.7)',
+                    'rgba(253, 202, 64, 0.7)',
+                    'rgba(13, 31, 45, 0.7)',
+                    'rgba(168, 213, 255, 0.7)'
+                ],
+                borderColor: [
+                    colors.primaryBlue,
+                    colors.secondaryBlue,
+                    colors.accentYellow,
+                    colors.darkText,
+                    colors.lightBlue
+                ],
+                borderWidth: 1
+            }]
+        };
+        new Chart(modelsCtx, { type: 'bar', data: modelsData, options: commonChartOptions });
+
+
+        const focusCtx = document.getElementById('focusChart').getContext('2d');
+        const focusData = {
+            labels: ['Estimulación Intelectual', 'Conexión Social', 'Habilidades Prácticas (Digital, etc.)', 'Bienestar y Salud', 'Educación Formal'].map(wrapLabel),
+            datasets: [{
+                data: [30, 25, 20, 15, 10],
+                backgroundColor: [colors.primaryBlue, colors.secondaryBlue, colors.accentYellow, colors.lightBlue, colors.darkText],
+                hoverOffset: 4
+            }]
+        };
+        new Chart(focusCtx, {
+            type: 'doughnut',
+            data: focusData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                 plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: tooltipTitleCallback
+                        }
+                    }
+                }
+            }
+        });
+        
+        const researchBubbleCtx = document.getElementById('researchBubbleChart').getContext('2d');
+        const researchData = {
+          datasets: [{
+            label: 'NIA (Gobierno/Política)',
+            data: [{ x: 2, y: 8, r: 30 }],
+            backgroundColor: 'rgba(13, 31, 45, 0.7)'
+          }, {
+            label: 'TGN (Red Traslacional)',
+            data: [{ x: 5, y: 6, r: 25 }],
+             backgroundColor: 'rgba(33, 118, 255, 0.7)'
+          }, {
+            label: 'NECS (Investigación Humana)',
+            data: [{ x: 8, y: 8, r: 20 }],
+             backgroundColor: 'rgba(51, 161, 253, 0.7)'
+          }, {
+            label: 'USC Longevity Inst. (Académico/Clínico)',
+            data: [{ x: 7, y: 3, r: 22 }],
+             backgroundColor: 'rgba(253, 202, 64, 0.7)'
+          }, {
+             label: 'ILC (Política/Defensa)',
+            data: [{ x: 4, y: 1, r: 18 }],
+             backgroundColor: 'rgba(168, 213, 255, 0.7)'
+          }]
+        };
+        new Chart(researchBubbleCtx, {
+          type: 'bubble',
+          data: researchData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                     callbacks: {
+                        label: function(context) {
+                            return context.dataset.label;
+                        }
+                    }
+                }
+            },
+            scales: {
+              y: { 
+                  title: { display: true, text: 'Enfoque en Investigación Básica' },
+                  min: 0, max: 10,
+                  grid: { display: false },
+                  ticks: { display: false }
+              },
+              x: { 
+                  title: { display: true, text: 'Enfoque en Aplicación Clínica y Política' },
+                  min: 0, max: 10,
+                  grid: { display: false },
+                  ticks: { display: false }
+              }
+            }
+          }
+        });
+
+        // Gemini API integration for personalized advice
+        const longevityPrompt = document.getElementById('longevityPrompt');
+        const generateAdviceBtn = document.getElementById('generateAdviceBtn');
+        const adviceOutput = document.getElementById('adviceOutput');
+        const adviceText = document.getElementById('adviceText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+
+        generateAdviceBtn.addEventListener('click', async () => {
+            const prompt = longevityPrompt.value.trim();
+            if (!prompt) {
+                adviceOutput.classList.add('hidden');
+                errorMessage.classList.remove('hidden');
+                errorMessage.querySelector('p').textContent = 'Por favor, escribe una pregunta o idea.';
+                return;
+            }
+
+            loadingSpinner.style.display = 'block'; // Show spinner
+            generateAdviceBtn.disabled = true; // Disable button
+            adviceOutput.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+
+            try {
+                let chatHistory = [];
+                const fullPrompt = `Eres un experto en envejecimiento saludable y aprendizaje continuo. Basado en la siguiente idea o pregunta: '${prompt}', genera un consejo breve y motivador, o una sugerencia de actividad, para una persona plateada. Enfócate en el bienestar, el aprendizaje a lo largo de la vida y la participación social.`;
+                chatHistory.push({ role: "user", parts: [{ text: fullPrompt }] });
+
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Canvas will provide this at runtime for gemini-2.0-flash
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    adviceText.textContent = text;
+                    adviceOutput.classList.remove('hidden');
+                } else {
+                    errorMessage.classList.remove('hidden');
+                    errorMessage.querySelector('p').textContent = 'No se pudo obtener una respuesta. Intenta con una pregunta diferente.';
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                errorMessage.classList.remove('hidden');
+                errorMessage.querySelector('p').textContent = 'Ocurrió un error al conectar con el servicio. Por favor, inténtalo de nuevo.';
+            } finally {
+                loadingSpinner.style.display = 'none'; // Hide spinner
+                generateAdviceBtn.disabled = false; // Enable button
+            }
+        });
+    </script>
+</body>
+</html>
