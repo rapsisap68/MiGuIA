@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiGuIA - Turismo Senior Sin Edadismo</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter - Reconocida por su alta legibilidad en pantallas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons - Iconos limpios y claros -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        /* Estilos personalizados y aplicación de la paleta de colores del manual */
+        :root {
+            --color-primary-bg: #F2F2F2; /* Gris claro base */
+            --color-secondary-text: #333333; /* Gris oscuro para texto, alto contraste */
+            --color-accent: #007BFF; /* Azul brillante para acciones */
+            --color-accent-hover: #0056b3;
+            --color-white: #FFFFFF;
+            --color-border: #E0E0E0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-primary-bg);
+            color: var(--color-secondary-text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Asegurando que el foco del teclado sea siempre visible para la accesibilidad */
+        *:focus-visible {
+            outline: 3px solid var(--color-accent);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        /* Estilos para los botones, asegurando un tamaño mínimo adecuado para la interacción táctil */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem; /* 12px 24px */
+            min-height: 44px;
+            min-width: 44px;
+            border-radius: 0.5rem; /* 8px */
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        .btn-accent {
+            background-color: var(--color-accent);
+            color: var(--color-white);
+        }
+
+        .btn-accent:hover {
+            background-color: var(--color-accent-hover);
+        }
+
+        .card {
+            background-color: var(--color-white);
+            border-radius: 0.75rem; /* 12px */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 1.5rem; /* 24px */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        
+        /* Ocultar scrollbar pero permitir scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="text-lg">
+
+    <!-- PANTALLA DE ACCESO INICIAL -->
+    <div id="access-screen" class="fixed inset-0 bg-gray-800 bg-opacity-90 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Bienvenido/a a MiGuIA</h1>
+            <p class="text-gray-600 mb-6">Tu Hub de Beneficios para un Turismo Sin Edadismo.</p>
+            <div class="space-y-4">
+                <input type="email" id="email-input" placeholder="Escribe tu correo electrónico" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" aria-label="Correo electrónico del usuario" required>
+                <div class="flex items-center justify-center space-x-3">
+                    <input type="checkbox" id="human-checkbox" class="h-6 w-6 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <label for="human-checkbox" class="text-gray-700 select-none">Soy humano</label>
+                </div>
+                <button id="access-button" class="btn btn-accent w-full text-xl">Ingresar</button>
+            </div>
+            <p id="access-error" class="text-red-600 mt-4 h-5"></p>
+            <div class="mt-6 text-xs text-gray-500">
+                <p>Por tu seguridad, la sesión expirará tras 5 minutos de inactividad.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CONTENIDO PRINCIPAL DE LA APLICACIÓN -->
+    <div id="main-app" class="hidden">
+        
+        <!-- HEADER -->
+        <header class="bg-white shadow-md sticky top-0 z-40 py-4">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <img src="https://placehold.co/50x50/007BFF/FFFFFF?text=MG" alt="Logo de MiGuIA" class="rounded-full">
+                        <div>
+                             <h1 class="text-2xl md:text-3xl font-bold text-gray-800">MiGuIA</h1>
+                             <div class="text-xs text-gray-500 mt-1">
+                                <span>Por: <strong>Ramiro A Paniagua G.</strong> para Movimiento Plateado</span>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div id="session-timer" class="flex items-center space-x-2 bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
+                            <i data-feather="clock" class="w-4 h-4"></i>
+                            <span id="timer-display">5:00</span>
+                        </div>
+                        <button id="mobile-menu-button" class="md:hidden p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500" aria-label="Abrir menú de navegación">
+                            <i data-feather="menu" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+                 <div class="mt-3 flex flex-wrap items-center gap-2">
+                    <span class="font-semibold text-sm text-gray-600">Etiquetas:</span>
+                    <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">Movimiento Plateado</span>
+                    <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">Turismo Senior</span>
+                    <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">Viajes</span>
+                    <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">Beneficios</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- NAVEGACIÓN (se convierte en menú móvil) -->
+        <nav id="navigation-menu" class="bg-gray-100 border-b border-gray-200 hidden md:block">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-center md:space-x-8 text-center space-y-2 md:space-y-0">
+                    <a href="#benefits-hub" class="font-semibold text-gray-600 hover:text-blue-600 transition-colors">Buscador de Beneficios</a>
+                    <a href="#human-advice" class="font-semibold text-gray-600 hover:text-blue-600 transition-colors">Asesoramiento Humano</a>
+                    <a href="#travel-insurance" class="font-semibold text-gray-600 hover:text-blue-600 transition-colors">Seguros de Viaje</a>
+                    <a href="#feedback" class="font-semibold text-gray-600 hover:text-blue-600 transition-colors">Envíanos tus Comentarios</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+            <!-- SECCIÓN DEL HUB DE BENEFICIOS -->
+            <section id="benefits-hub" class="mb-16 scroll-mt-32">
+                <div class="text-center mb-10">
+                    <h2 class="text-4xl font-bold text-gray-800">Hub de Beneficios Sénior</h2>
+                    <p class="mt-2 text-xl text-gray-600 max-w-3xl mx-auto">Encuentra y aprovecha todos los descuentos y servicios prioritarios para tu próximo viaje.</p>
+                </div>
+
+                <!-- FILTROS DE BÚSQUEDA -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-8 sticky top-32 z-30">
+                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="search-destination" class="block text-sm font-bold text-gray-700 mb-1">Buscar por destino o palabra clave</label>
+                            <input type="text" id="search-destination" placeholder="Ej: Madrid, museo, tren" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="filter-category" class="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
+                            <select id="filter-category" class="w-full p-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="all">Todas las categorías</option>
+                                <option value="Transporte">Transporte</option>
+                                <option value="Alojamiento">Alojamiento</option>
+                                <option value="Atracciones">Atracciones y Cultura</option>
+                                <option value="Gobierno">Programas Gubernamentales</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="clear-filters" class="btn bg-gray-200 text-gray-700 hover:bg-gray-300 w-full">Limpiar filtros</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LISTADO DE BENEFICIOS -->
+                <div id="benefits-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Las tarjetas de beneficios se insertarán aquí con JavaScript -->
+                </div>
+                <div id="no-results" class="hidden text-center py-12">
+                     <i data-feather="search" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
+                     <h3 class="text-2xl font-semibold text-gray-700">Sin resultados</h3>
+                     <p class="text-gray-500 mt-1">Intenta con otros filtros o palabras clave.</p>
+                </div>
+            </section>
+
+            <!-- OTRAS SECCIONES -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- ASESORAMIENTO HUMANO -->
+                <section id="human-advice" class="card lg:col-span-2 scroll-mt-32">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <i data-feather="phone-call" class="w-8 h-8 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">Asesoramiento Humano y Directo</h3>
+                            <p class="mt-2 text-gray-600">El contacto humano es valioso. Nuestros expertos están listos para ayudarte a planificar tu viaje y resolver cualquier duda sobre los beneficios disponibles.
+                            </p>
+                            <div class="mt-4 space-y-3">
+                                <p class="flex items-center"><i data-feather="mail" class="w-5 h-5 mr-3 text-blue-600"></i> <a href="mailto:asesores@miguia.com" class="hover:underline">asesores@miguia.com</a></p>
+                                <p class="flex items-center"><i data-feather="phone" class="w-5 h-5 mr-3 text-blue-600"></i> +57 300 123 4567</p>
+                                <p class="flex items-center"><i data-feather="message-circle" class="w-5 h-5 mr-3 text-blue-600"></i> Chat en vivo (Próximamente)</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEGUROS DE VIAJE -->
+                <section id="travel-insurance" class="card scroll-mt-32">
+                     <div class="flex items-start space-x-4">
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i data-feather="shield" class="w-8 h-8 text-green-600"></i>
+                        </div>
+                        <div>
+                           <h3 class="text-2xl font-bold text-gray-800">Viaja con Tranquilidad</h3>
+                           <p class="mt-2 text-gray-600">Recomendamos siempre contratar un seguro de viaje adecuado. Te ofrecemos enlaces a proveedores confiables.</p>
+                           <a href="#" class="btn btn-accent mt-4">Ver opciones de seguro</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- FEEDBACK -->
+            <section id="feedback" class="card mt-8 scroll-mt-32">
+                <h3 class="text-2xl font-bold text-gray-800 text-center">Tu opinión nos hace mejores</h3>
+                <p class="mt-2 text-gray-600 text-center max-w-2xl mx-auto">¿Tienes sugerencias, encontraste un nuevo beneficio o quieres reportar una incidencia? ¡Cuéntanos!</p>
+                <form class="mt-6 max-w-xl mx-auto space-y-4">
+                    <div>
+                        <label for="feedback-message" class="sr-only">Tu mensaje</label>
+                        <textarea id="feedback-message" rows="4" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-accent">Enviar Comentario</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+        
+        <!-- FOOTER -->
+        <footer class="bg-gray-800 text-white mt-16">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                <div class="text-center mb-8">
+                    <p class="text-xl italic">"La edad es solo un número. Las aventuras son para siempre."</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-b border-gray-700 pb-8">
+                    <div class="text-center md:text-left">
+                        <h4 class="text-2xl font-bold">Movimiento Plateado</h4>
+                        <p class="mt-2 text-gray-300 max-w-md">Red inclusiva, activa, propositiva y participativa para cocrear, proponer y actuar para la Vida Plena de personas plateadas.</p>
+                    </div>
+                    <div class="flex flex-col items-center md:items-end">
+                         <p class="font-semibold mb-3">Síguenos y contáctanos:</p>
+                         <div class="flex space-x-5">
+                            <a href="https://movimientoplateado.com/" target="_blank" class="hover:text-blue-400 transition-colors" aria-label="Sitio web de Movimiento Plateado"><i data-feather="globe" class="w-7 h-7"></i></a>
+                            <a href="https://www.facebook.com/profile.php?id=61573086449893" target="_blank" class="hover:text-blue-400 transition-colors" aria-label="Facebook de Club Plateado"><i data-feather="facebook" class="w-7 h-7"></i></a>
+                            <a href="https://www.youtube.com/@MovimientoPlateado" target="_blank" class="hover:text-blue-400 transition-colors" aria-label="YouTube de Movimiento Plateado"><i data-feather="youtube" class="w-7 h-7"></i></a>
+                            <a href="https://www.linkedin.com/in/ramiropaniagua" target="_blank" class="hover:text-blue-400 transition-colors" aria-label="LinkedIn de Ramiro Paniagua"><i data-feather="linkedin" class="w-7 h-7"></i></a>
+                            <a href="mailto:movimientoplateado@gmail.com" class="hover:text-blue-400 transition-colors" aria-label="Enviar correo a Movimiento Plateado"><i data-feather="mail" class="w-7 h-7"></i></a>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN DE CÓDIGOS QR -->
+                <div class="py-8">
+                    <h5 class="text-center text-lg font-semibold text-gray-300 mb-6">Accede rápidamente con tu cámara</h5>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 justify-items-center">
+                        <div class="text-center">
+                            <a href="https://movimientoplateado.com/" target="_blank">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://movimientoplateado.com/" alt="QR Code para Sitio Web Movimiento Plateado" class="bg-white p-1 rounded-md mx-auto">
+                            </a>
+                            <p class="mt-2 text-xs text-gray-400">Sitio Web</p>
+                        </div>
+                        <div class="text-center">
+                            <a href="https://www.facebook.com/profile.php?id=61573086449893" target="_blank">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.facebook.com/profile.php?id=61573086449893" alt="QR Code para Facebook Club Plateado" class="bg-white p-1 rounded-md mx-auto">
+                            </a>
+                            <p class="mt-2 text-xs text-gray-400">Facebook</p>
+                        </div>
+                        <div class="text-center">
+                             <a href="https://www.youtube.com/@MovimientoPlateado" target="_blank">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.youtube.com/@MovimientoPlateado" alt="QR Code para YouTube Movimiento Plateado" class="bg-white p-1 rounded-md mx-auto">
+                            </a>
+                            <p class="mt-2 text-xs text-gray-400">YouTube</p>
+                        </div>
+                        <div class="text-center">
+                            <a href="https://www.linkedin.com/in/ramiropaniagua" target="_blank">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.linkedin.com/in/ramiropaniagua" alt="QR Code para LinkedIn Ramiro Paniagua" class="bg-white p-1 rounded-md mx-auto">
+                            </a>
+                            <p class="mt-2 text-xs text-gray-400">LinkedIn</p>
+                        </div>
+                         <div class="text-center col-span-2 sm:col-span-1 md:col-span-1">
+                            <a href="mailto:movimientoplateado@gmail.com">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=mailto:movimientoplateado@gmail.com" alt="QR Code para Correo Electrónico" class="bg-white p-1 rounded-md mx-auto">
+                            </a>
+                            <p class="mt-2 text-xs text-gray-400">Email</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm">
+                    <p>Desarrollado con ♥ para <a href="https://movimientoplateado.com/" target="_blank" class="font-semibold hover:text-white">Movimiento Plateado</a>.</p>
+                    <p>&copy; 2024 MiGuIA. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODAL PARA DETALLES DEL BENEFICIO -->
+    <div id="benefit-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden">
+        <div id="modal-content" class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto no-scrollbar relative">
+            <!-- Contenido del modal se insertará aquí -->
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- CONSTANTES Y ESTADO ---
+            const accessScreen = document.getElementById('access-screen');
+            const mainApp = document.getElementById('main-app');
+            const accessButton = document.getElementById('access-button');
+            const emailInput = document.getElementById('email-input');
+            const humanCheckbox = document.getElementById('human-checkbox');
+            const accessError = document.getElementById('access-error');
+            const timerDisplay = document.getElementById('timer-display');
+            const benefitsList = document.getElementById('benefits-list');
+            const noResults = document.getElementById('no-results');
+            const searchInput = document.getElementById('search-destination');
+            const categoryFilter = document.getElementById('filter-category');
+            const clearFiltersButton = document.getElementById('clear-filters');
+            const benefitModal = document.getElementById('benefit-modal');
+            const modalContent = document.getElementById('modal-content');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const navigationMenu = document.getElementById('navigation-menu');
+            
+            let sessionTimerInterval;
+            const SESSION_DURATION = 5 * 60; // 5 minutos en segundos
+
+            // --- BASE DE DATOS DE BENEFICIOS (Mockup) ---
+            const benefitsData = [
+                { id: 1, title: 'Descuento RENFE "Tarjeta Dorada"', category: 'Transporte', destination: 'España', summary: 'Viaja en tren por España con hasta un 40% de descuento. Para mayores de 60 años.', description: 'La Tarjeta Dorada de RENFE está destinada a mayores de 60 años, pensionistas y personas con discapacidad, ofreciendo importantes descuentos en todo tipo de trenes.', requirements: 'Ser mayor de 60 años, pensionista o persona con discapacidad acreditada. Se adquiere en estaciones RENFE o agencias de viaje.', savings: 'Entre 25% y 40% de descuento dependiendo del tipo de tren y el día de la semana.', howto: '1. Adquirir la Tarjeta Dorada (coste anual de 6€).\n2. Presentar la tarjeta al comprar billetes online, en taquilla o máquinas autoventa.\n3. ¡Disfrutar del viaje!', icon: 'train' },
+                { id: 2, title: 'IMSERSO: Turismo Social', category: 'Gobierno', destination: 'España', summary: 'Programa del Gobierno de España para viajar a precios muy reducidos en temporada baja.', description: 'El Programa de Turismo del Imserso fomenta el envejecimiento activo y las estancias en zonas costeras y de interior a precios excepcionales para pensionistas.', requirements: 'Ser pensionista de jubilación del sistema de Seguridad Social español, o viudedad con 55+ años, entre otros requisitos. Se solicita en plazos específicos.', savings: 'Subvenciones de hasta el 50-70% del coste real del viaje.', howto: '1. Cumplir los requisitos.\n2. Presentar la solicitud en los plazos oficiales.\n3. Una vez acreditado, elegir y reservar el destino deseado.', icon: 'sun' },
+                { id: 3, title: 'Entrada Reducida Museos Nacionales', category: 'Atracciones', destination: 'Colombia', summary: 'Acceso con tarifa reducida a los museos gestionados por el Ministerio de Cultura.', description: 'Los adultos mayores de 60 años gozan de tarifas especiales para acceder a la riqueza cultural de los museos nacionales en toda Colombia.', requirements: 'Presentar documento de identidad que acredite ser mayor de 60 años.', savings: 'Descuentos de hasta el 50% o entrada gratuita en algunos casos.', howto: 'Solicitar la tarifa de adulto mayor en la taquilla del museo presentando el documento de identidad.', icon: 'award' },
+                { id: 4, title: 'Descuentos en Aerolíneas (Solicitud)', category: 'Transporte', destination: 'Global', summary: 'Algunas aerolíneas ofrecen descuentos a mayores, pero a menudo deben solicitarse por teléfono.', description: 'Aunque no siempre se publicitan, aerolíneas como Avianca o Iberia pueden ofrecer tarifas especiales para mayores de 60 o 65 años. Es fundamental preguntar.', requirements: 'Tener la edad requerida por la aerolínea (normalmente 60 o 65+).', savings: 'Variable, usualmente entre 5% y 10% sobre la tarifa base.', howto: 'Llamar directamente al centro de atención telefónica de la aerolínea y preguntar explícitamente por "descuentos para adulto mayor" o "tarifa sénior".', icon: 'send' },
+                { id: 5, title: 'Pases de Parques Nacionales (Senior Pass)', category: 'Atracciones', destination: 'EE.UU.', summary: 'Pase anual o vitalicio para acceder a más de 2,000 sitios recreativos federales en EE.UU.', description: 'El "America the Beautiful - National Parks & Federal Recreational Lands Senior Pass" es un pase muy asequible para ciudadanos o residentes permanentes de EE.UU. de 62 años o más.', requirements: 'Ser ciudadano o residente permanente de EE.UU. y tener 62 años cumplidos.', savings: 'El pase anual cuesta $20 y el vitalicio $80, dando acceso ilimitado a todos los parques nacionales.', howto: 'Se puede comprar online a través de la tienda de USGS, o en persona en un sitio de recreación federal que los emita.', icon: 'map-pin' },
+                { id: 6, title: 'Descuentos en Cadenas Hoteleras', category: 'Alojamiento', destination: 'Global', summary: 'Grandes cadenas como Marriott o Hilton ofrecen tarifas reducidas para viajeros sénior.', description: 'Muchas cadenas hoteleras internacionales tienen programas de descuento para personas mayores de 62 años, ofreciendo un porcentaje de rebaja sobre la tarifa estándar.', requirements: 'Tener 62 años o más y presentar una identificación al hacer el check-in.', savings: 'Normalmente entre un 10% y un 15%.', howto: 'Seleccionar la tarifa "Senior Discount" al hacer la reserva en la web del hotel o mencionarlo al reservar por teléfono.', icon: 'home' }
+            ];
+
+            // --- FUNCIONES ---
+
+            // Función para validar email
+            function isValidEmail(email) {
+                const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+                return regex.test(email);
+            }
+
+            // Función para iniciar la aplicación
+            function startApp() {
+                accessScreen.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                feather.replace(); 
+                renderBenefits(benefitsData);
+                resetSessionTimer();
+                // Añadir listeners para resetear el timer con la actividad del usuario
+                ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+                    window.addEventListener(event, resetSessionTimer);
+                });
+            }
+
+            // Función para finalizar la sesión
+            function endSession() {
+                clearInterval(sessionTimerInterval);
+                 // Remover listeners para evitar que se ejecuten cuando la pantalla de acceso está activa
+                ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+                    window.removeEventListener(event, resetSessionTimer);
+                });
+                mainApp.classList.add('hidden');
+                accessScreen.classList.remove('hidden');
+                accessError.textContent = 'La sesión ha expirado por inactividad.';
+                emailInput.value = '';
+                humanCheckbox.checked = false;
+            }
+
+            // Función para el temporizador de inactividad
+            function resetSessionTimer() {
+                clearInterval(sessionTimerInterval);
+                let timeLeft = SESSION_DURATION;
+                
+                sessionTimerInterval = setInterval(() => {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                    if (timeLeft <= 0) {
+                        endSession();
+                    }
+                }, 1000);
+            }
+
+            // Función para renderizar los beneficios
+            function renderBenefits(data) {
+                benefitsList.innerHTML = '';
+                if (data.length === 0) {
+                    noResults.classList.remove('hidden');
+                    return;
+                }
+                
+                noResults.classList.add('hidden');
+                data.forEach(benefit => {
+                    const card = document.createElement('div');
+                    card.className = 'card flex flex-col';
+                    card.innerHTML = `
+                        <div class="flex-grow">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <i data-feather="${benefit.icon}" class="w-6 h-6 text-blue-600"></i>
+                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${benefit.category}</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-800 mb-2">${benefit.title}</h4>
+                            <p class="text-gray-600">${benefit.summary}</p>
+                        </div>
+                        <div class="mt-4">
+                            <button class="btn btn-accent w-full view-details" data-id="${benefit.id}">Ver más detalles</button>
+                        </div>
+                    `;
+                    benefitsList.appendChild(card);
+                });
+                feather.replace();
+
+                document.querySelectorAll('.view-details').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const benefitId = parseInt(e.currentTarget.dataset.id);
+                        openModal(benefitId);
+                    });
+                });
+            }
+
+            // Función para filtrar y buscar
+            function filterAndSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const category = categoryFilter.value;
+                
+                const filteredData = benefitsData.filter(benefit => {
+                    const matchesCategory = category === 'all' || benefit.category === category;
+                    const matchesSearch = benefit.title.toLowerCase().includes(searchTerm) ||
+                                          benefit.destination.toLowerCase().includes(searchTerm) ||
+                                          benefit.description.toLowerCase().includes(searchTerm);
+                    return matchesCategory && matchesSearch;
+                });
+                renderBenefits(filteredData);
+            }
+            
+            // Función para abrir el modal con detalles
+            function openModal(benefitId) {
+                const benefit = benefitsData.find(b => b.id === benefitId);
+                if (!benefit) return;
+
+                modalContent.innerHTML = `
+                    <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800" aria-label="Cerrar ventana modal">
+                        <i data-feather="x" class="w-8 h-8"></i>
+                    </button>
+                    <div class="p-8">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i data-feather="${benefit.icon}" class="w-10 h-10 text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-bold text-gray-800">${benefit.title}</h3>
+                                <p class="text-lg text-gray-500">${benefit.destination} - ${benefit.category}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-6 text-lg text-gray-700 mt-6">
+                            <div><h5 class="font-bold text-xl mb-1">Descripción</h5><p>${benefit.description}</p></div>
+                            <div><h5 class="font-bold text-xl mb-1">Requisitos</h5><p>${benefit.requirements}</p></div>
+                            <div><h5 class="font-bold text-xl mb-1">Ahorro estimado</h5><p class="font-semibold text-green-600">${benefit.savings}</p></div>
+                            <div><h5 class="font-bold text-xl mb-1">¿Cómo solicitarlo?</h5><p class="whitespace-pre-line">${benefit.howto}</p></div>
+                        </div>
+                    </div>
+                `;
+                benefitModal.classList.remove('hidden');
+                feather.replace();
+                document.getElementById('close-modal').addEventListener('click', closeModal);
+            }
+
+            // Función para cerrar el modal
+            function closeModal() {
+                benefitModal.classList.add('hidden');
+            }
+
+            // --- EVENT LISTENERS ---
+            accessButton.addEventListener('click', () => {
+                const email = emailInput.value.trim();
+                accessError.textContent = ''; // Limpiar errores previos
+
+                if (!isValidEmail(email)) {
+                    accessError.textContent = 'Por favor, introduce un correo electrónico válido.';
+                    return;
+                }
+                if (!humanCheckbox.checked) {
+                    accessError.textContent = 'Por favor, confirma que eres humano.';
+                    return;
+                }
+                startApp();
+            });
+
+            searchInput.addEventListener('input', filterAndSearch);
+            categoryFilter.addEventListener('change', filterAndSearch);
+            clearFiltersButton.addEventListener('click', () => {
+                searchInput.value = '';
+                categoryFilter.value = 'all';
+                renderBenefits(benefitsData);
+            });
+            
+            benefitModal.addEventListener('click', (e) => {
+                if (e.target === benefitModal) { closeModal(); }
+            });
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !benefitModal.classList.contains('hidden')) { closeModal(); }
+            });
+
+            mobileMenuButton.addEventListener('click', () => {
+                navigationMenu.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(this.getAttribute('href'));
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    if (!navigationMenu.classList.contains('hidden') && window.innerWidth < 768) {
+                        navigationMenu.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
