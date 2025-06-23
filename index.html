@@ -26,6 +26,8 @@
             --color-border: #E0E0E0;
         }
 
+        html { scroll-behavior: smooth; }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--color-primary-bg);
@@ -78,9 +80,12 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Estilos para el menú lateral */
         #main-menu-panel { transition: transform 0.3s ease-in-out; }
         #main-menu-backdrop { transition: opacity 0.3s ease-in-out; }
+
+        #feedback-toast {
+            transition: opacity 0.5s, transform 0.5s;
+        }
     </style>
 </head>
 <body class="text-lg">
@@ -88,19 +93,19 @@
     <!-- PANTALLA DE ACCESO INICIAL -->
     <div id="access-screen" class="fixed inset-0 bg-gray-800 bg-opacity-90 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full text-center">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Bienvenido/a a MiGuIA</h1>
-            <p class="text-gray-600 mb-6">Tu Hub de Beneficios para un Turismo Sin Edadismo.</p>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2" data-translate-key="access_title">Bienvenido/a a MiGuIA</h1>
+            <p class="text-gray-600 mb-6" data-translate-key="access_subtitle">Tu Hub de Beneficios para un Turismo Sin Edadismo.</p>
             <div class="space-y-4">
-                <input type="email" id="email-input" placeholder="Escribe tu correo electrónico" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" aria-label="Correo electrónico del usuario" required>
+                <input type="email" id="email-input" placeholder="Escribe tu correo electrónico" data-translate-key="access_email_placeholder" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500" aria-label="Correo electrónico del usuario" required>
                 <div class="flex items-center justify-center space-x-3">
                     <input type="checkbox" id="human-checkbox" class="h-6 w-6 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                    <label for="human-checkbox" class="text-gray-700 select-none">Soy humano</label>
+                    <label for="human-checkbox" class="text-gray-700 select-none" data-translate-key="access_human_check">Soy humano</label>
                 </div>
-                <button id="access-button" class="btn btn-accent w-full text-xl">Ingresar</button>
+                <button id="access-button" class="btn btn-accent w-full text-xl" data-translate-key="access_button">Ingresar</button>
             </div>
             <p id="access-error" class="text-red-600 mt-4 h-5"></p>
             <div class="mt-6 text-xs text-gray-500">
-                <p>Por tu seguridad, la sesión expirará tras 5 minutos de inactividad.</p>
+                <p data-translate-key="access_security_note">Por tu seguridad, la sesión expirará tras 5 minutos de inactividad.</p>
             </div>
         </div>
     </div>
@@ -113,25 +118,27 @@
         <div id="main-menu-panel" class="fixed top-0 left-0 h-full w-72 bg-white shadow-xl z-50 transform -translate-x-full no-scrollbar overflow-y-auto">
             <div class="p-4">
                 <div class="flex items-center justify-between mb-6">
-                     <h2 class="text-xl font-bold text-gray-800">Movimiento Plateado</h2>
+                     <h2 class="text-xl font-bold text-gray-800" data-translate-key="menu_title">Movimiento Plateado</h2>
                      <button id="close-main-menu" class="p-1 rounded-full hover:bg-gray-200" aria-label="Cerrar menú principal">
                          <i data-feather="x" class="w-6 h-6"></i>
                      </button>
                 </div>
                 <nav>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Aplicaciones</h3>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2" data-translate-key="menu_apps">Aplicaciones</h3>
                     <ul class="space-y-1 mb-6">
-                        <li><a href="https://forms.gle/Z3ffKFkeU6ZaxQqo8" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="file-text" class="w-5 h-5 mr-3"></i>Manifiesto Plateado</a></li>
-                        <li><a href="https://forms.gle/eUtXLzs33TvoLsCt9" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="users" class="w-5 h-5 mr-3"></i>Formulario Club Plateado</a></li>
-                        <li><a href="https://gemini.google.com/share/875ce9b3fec4" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="shield" class="w-5 h-5 mr-3"></i>Consulta Si Riesgo CiberSeguridad</a></li>
-                        <li><a href="https://gemini.google.com/share/e932e5c535c4" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="check-circle" class="w-5 h-5 mr-3"></i>Consulta Acciones Ciberseguridad</a></li>
-                        <li><a href="https://gemini.google.com/share/a82beff63e84" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="help-circle" class="w-5 h-5 mr-3"></i>Consulta Atención Básica</a></li>
-                        <li><a href="https://ruogmnpl.manus.space/" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="grid" class="w-5 h-5 mr-3"></i>Sudoku</a></li>
+                        <li><a href="https://forms.gle/Z3ffKFkeU6ZaxQqo8" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="file-text" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_app_manifiesto">Manifiesto Plateado</span></a></li>
+                        <li><a href="https://forms.gle/eUtXLzs33TvoLsCt9" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="users" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_app_club">Formulario Club Plateado</span></a></li>
+                        <li><a href="https://gemini.google.com/share/875ce9b3fec4" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="shield" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_app_ciber_riesgo">Consulta Si Riesgo CiberSeguridad</span></a></li>
+                        <li><a href="https://gemini.google.com/share/e932e5c535c4" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="check-circle" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_app_ciber_acciones">Consulta Acciones Ciberseguridad</span></a></li>
+                        <li><a href="https://gemini.google.com/share/a82beff63e84" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="help-circle" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_app_atencion">Consulta Atención Básica</span></a></li>
+                        <li><a href="https://ruogmnpl.manus.space/" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="grid" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_app_sudoku">Sudoku</span></a></li>
                     </ul>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Pilotos</h3>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2" data-translate-key="menu_pilots">Pilotos</h3>
                      <ul class="space-y-1">
-                        <li><a href="https://m8cpwcstpl.space.minimax.io/" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="box" class="w-5 h-5 mr-3"></i>Conceptual Gerontología</a></li>
-                        <li><a href="https://lvfllsvt.manus.space/" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="camera" class="w-5 h-5 mr-3"></i>Detector de Objeto Entorno</a></li>
+                        <li><a href="https://m8cpwcstpl.space.minimax.io/" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="box" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_pilot_geronto">Conceptual Gerontología</span></a></li>
+                        <li><a href="https://lvfllsvt.manus.space/" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="camera" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_pilot_detector">Detector de Objeto Entorno</span></a></li>
+                        <li><a href="https://tfgywexw.manus.space/" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="map-pin" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_pilot_antioquia">Antioquia, IA y Gerontología</span></a></li>
+                        <li><a href="https://fvtwumez.manus.space/" target="_blank" rel="noopener noreferrer" class="flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"><i data-feather="mic" class="w-5 h-5 mr-3"></i><span data-translate-key="menu_pilot_sentimientos">Análisis de Sentimientos en la Voz</span></a></li>
                     </ul>
                 </nav>
             </div>
@@ -145,25 +152,24 @@
                         <button id="open-main-menu" class="p-2 rounded-md hover:bg-gray-100" aria-label="Abrir menú principal de aplicaciones">
                              <i data-feather="menu" class="w-6 h-6"></i>
                         </button>
-                        <img src="https://placehold.co/40x40/007BFF/FFFFFF?text=MG" alt="Logo de MiGuIA" class="rounded-full">
+                        <img src="https://storage.googleapis.com/gemini-prod-us-west1-409903542289-assets/9d4370b9-e4d2-4088-aae1-47aa9df1a696" alt="Logo de Movimiento Plateado" class="h-10 w-10">
                         <div>
                              <div class="flex items-center gap-x-3">
                                  <h1 class="text-xl md:text-2xl font-bold text-gray-800">MiGuIA</h1>
-                                 <!-- Selector de Idioma -->
                                  <div class="relative">
                                      <button id="lang-selector-btn" class="flex items-center text-sm text-gray-600 hover:text-blue-600">
                                          <i data-feather="globe" class="w-4 h-4 mr-1"></i>
-                                         <span>ES</span>
+                                         <span id="lang-display">ES</span>
                                          <i data-feather="chevron-down" class="w-4 h-4 ml-1"></i>
                                      </button>
                                      <div id="lang-dropdown" class="absolute top-full mt-2 w-28 bg-white rounded-md shadow-lg py-1 hidden">
-                                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="ES">Español</a>
-                                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="EN">English</a>
+                                         <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="ES">Español</a>
+                                         <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="EN">English</a>
                                      </div>
                                  </div>
                              </div>
                              <div class="text-xs text-gray-500 mt-1 hidden sm:block">
-                                <span>Por: <strong>Ramiro A Paniagua G.</strong> para Movimiento Plateado</span>
+                                <span data-translate-key="header_author">Por: <strong>Ramiro A Paniagua G.</strong> para Movimiento Plateado</span>
                              </div>
                         </div>
                     </div>
@@ -178,9 +184,9 @@
                     </div>
                 </div>
                  <div class="mt-2 flex flex-wrap items-center gap-2">
-                    <span class="font-semibold text-sm text-gray-600">Etiquetas:</span>
+                    <span class="font-semibold text-sm text-gray-600" data-translate-key="header_tags">Etiquetas:</span>
                     <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">Movimiento Plateado</span>
-                    <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">Turismo Senior</span>
+                    <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full" data-translate-key="tag_senior_tourism">Turismo Senior</span>
                 </div>
             </div>
         </header>
@@ -189,10 +195,10 @@
         <nav id="navigation-menu" class="bg-gray-100 border-b border-gray-200 hidden md:block">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-2">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-center md:space-x-8 text-center space-y-2 md:space-y-0">
-                    <a href="#benefits-hub" class="nav-link font-semibold text-gray-600 hover:text-blue-600 transition-colors">Buscador de Beneficios</a>
-                    <a href="#human-advice" class="nav-link font-semibold text-gray-600 hover:text-blue-600 transition-colors">Asesoramiento Humano</a>
-                    <a href="#travel-insurance" class="nav-link font-semibold text-gray-600 hover:text-blue-600 transition-colors">Seguros de Viaje</a>
-                    <a href="#feedback" class="nav-link font-semibold text-gray-600 hover:text-blue-600 transition-colors">Envíanos tus Comentarios</a>
+                    <a href="#benefits-hub" class="nav-link font-semibold text-gray-600 hover:text-blue-600 transition-colors" data-translate-key="nav_benefits">Buscador de Beneficios</a>
+                    <a href="#human-advice" class="nav-link font-semibold text-gray-600 hover:text-blue-600 transition-colors" data-translate-key="nav_advice">Asesoramiento Humano</a>
+                    <a href="#travel-insurance" class="nav-link font-semibold text-gray-600 hover:text-blue-600 transition-colors" data-translate-key="nav_insurance">Seguros de Viaje</a>
+                    <a href="#feedback" class="nav-link font-semibold text-gray-600 hover:text-blue-600 transition-colors" data-translate-key="nav_feedback">Envíanos tus Comentarios</a>
                 </div>
             </div>
         </nav>
@@ -201,28 +207,28 @@
 
             <section id="benefits-hub" class="mb-16">
                 <div class="text-center mb-10">
-                    <h2 class="text-4xl font-bold text-gray-800">Hub de Beneficios Sénior</h2>
-                    <p class="mt-2 text-xl text-gray-600 max-w-3xl mx-auto">Encuentra y aprovecha todos los descuentos y servicios prioritarios para tu próximo viaje.</p>
+                    <h2 class="text-4xl font-bold text-gray-800" data-translate-key="benefits_title">Hub de Beneficios Sénior</h2>
+                    <p class="mt-2 text-xl text-gray-600 max-w-3xl mx-auto" data-translate-key="benefits_subtitle">Encuentra y aprovecha todos los descuentos y servicios prioritarios para tu próximo viaje.</p>
                 </div>
 
                 <div id="filters-container" class="bg-white p-6 rounded-xl shadow-lg mb-8 sticky top-0 z-20">
                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label for="search-destination" class="block text-sm font-bold text-gray-700 mb-1">Buscar por destino o palabra clave</label>
-                            <input type="text" id="search-destination" placeholder="Ej: Madrid, museo, tren" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500">
+                            <label for="search-destination" class="block text-sm font-bold text-gray-700 mb-1" data-translate-key="filter_search_label">Buscar por destino o palabra clave</label>
+                            <input type="text" id="search-destination" placeholder="Ej: Madrid, museo, tren" data-translate-key="filter_search_placeholder" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
-                            <label for="filter-category" class="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
+                            <label for="filter-category" class="block text-sm font-bold text-gray-700 mb-1" data-translate-key="filter_category_label">Categoría</label>
                             <select id="filter-category" class="w-full p-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-blue-500">
-                                <option value="all">Todas las categorías</option>
-                                <option value="Transporte">Transporte</option>
-                                <option value="Alojamiento">Alojamiento</option>
-                                <option value="Atracciones">Atracciones y Cultura</option>
-                                <option value="Gobierno">Programas Gubernamentales</option>
+                                <option value="all" data-translate-key="filter_cat_all">Todas las categorías</option>
+                                <option value="Transporte" data-translate-key="filter_cat_transport">Transporte</option>
+                                <option value="Alojamiento" data-translate-key="filter_cat_lodging">Alojamiento</option>
+                                <option value="Atracciones" data-translate-key="filter_cat_attractions">Atracciones y Cultura</option>
+                                <option value="Gobierno" data-translate-key="filter_cat_gov">Programas Gubernamentales</option>
                             </select>
                         </div>
                         <div class="flex items-end">
-                            <button id="clear-filters" class="btn bg-gray-200 text-gray-700 hover:bg-gray-300 w-full">Limpiar filtros</button>
+                            <button id="clear-filters" class="btn bg-gray-200 text-gray-700 hover:bg-gray-300 w-full" data-translate-key="filter_clear_button">Limpiar filtros</button>
                         </div>
                     </div>
                 </div>
@@ -230,32 +236,162 @@
                 <div id="benefits-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
                 <div id="no-results" class="hidden text-center py-12">
                      <i data-feather="search" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
-                     <h3 class="text-2xl font-semibold text-gray-700">Sin resultados</h3>
-                     <p class="text-gray-500 mt-1">Intenta con otros filtros o palabras clave.</p>
+                     <h3 class="text-2xl font-semibold text-gray-700" data-translate-key="no_results_title">Sin resultados</h3>
+                     <p class="text-gray-500 mt-1" data-translate-key="no_results_subtitle">Intenta con otros filtros o palabras clave.</p>
                 </div>
             </section>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <section id="human-advice" class="card lg:col-span-2"><div class="flex items-start space-x-4"><div class="bg-blue-100 p-3 rounded-full"><i data-feather="phone-call" class="w-8 h-8 text-blue-600"></i></div><div><h3 class="text-2xl font-bold text-gray-800">Asesoramiento Humano y Directo</h3><p class="mt-2 text-gray-600">Nuestros expertos están listos para ayudarte a planificar tu viaje y resolver cualquier duda.</p><div class="mt-4 space-y-3"><p class="flex items-center"><i data-feather="mail" class="w-5 h-5 mr-3 text-blue-600"></i> <a href="mailto:asesores@miguia.com" class="hover:underline">asesores@miguia.com</a></p><p class="flex items-center"><i data-feather="phone" class="w-5 h-5 mr-3 text-blue-600"></i> +57 300 123 4567</p></div></div></div></section>
-                <section id="travel-insurance" class="card"><div class="flex items-start space-x-4"><div class="bg-green-100 p-3 rounded-full"><i data-feather="shield" class="w-8 h-8 text-green-600"></i></div><div><h3 class="text-2xl font-bold text-gray-800">Viaja con Tranquilidad</h3><p class="mt-2 text-gray-600">Recomendamos siempre contratar un seguro de viaje adecuado.</p><a href="#" class="btn btn-accent mt-4">Ver opciones de seguro</a></div></div></section>
+                <section id="human-advice" class="card lg:col-span-2"><div class="flex items-start space-x-4"><div class="bg-blue-100 p-3 rounded-full"><i data-feather="phone-call" class="w-8 h-8 text-blue-600"></i></div><div><h3 class="text-2xl font-bold text-gray-800" data-translate-key="advice_title">Asesoramiento Humano y Directo</h3><p class="mt-2 text-gray-600" data-translate-key="advice_subtitle">Nuestros expertos están listos para ayudarte a planificar tu viaje y resolver cualquier duda.</p><div class="mt-4 space-y-3"><p class="flex items-center"><i data-feather="mail" class="w-5 h-5 mr-3 text-blue-600"></i> <a href="mailto:asesores@miguia.com" class="hover:underline">asesores@miguia.com</a></p><p class="flex items-center"><i data-feather="phone" class="w-5 h-5 mr-3 text-blue-600"></i> +57 300 123 4567</p></div></div></div></section>
+                <section id="travel-insurance" class="card"><div class="flex items-start space-x-4"><div class="bg-green-100 p-3 rounded-full"><i data-feather="shield" class="w-8 h-8 text-green-600"></i></div><div><h3 class="text-2xl font-bold text-gray-800" data-translate-key="insurance_title">Viaja con Tranquilidad</h3><p class="mt-2 text-gray-600" data-translate-key="insurance_subtitle">Recomendamos siempre contratar un seguro de viaje adecuado.</p><a href="#" class="btn btn-accent mt-4" data-translate-key="insurance_button">Ver opciones de seguro</a></div></div></section>
             </div>
 
-            <section id="feedback" class="card mt-8"><h3 class="text-2xl font-bold text-gray-800 text-center">Tu opinión nos hace mejores</h3><p class="mt-2 text-gray-600 text-center max-w-2xl mx-auto">¿Tienes sugerencias o quieres reportar una incidencia? ¡Cuéntanos!</p><form class="mt-6 max-w-xl mx-auto space-y-4"><div><label for="feedback-message" class="sr-only">Tu mensaje</label><textarea id="feedback-message" rows="4" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500" placeholder="Escribe tu mensaje aquí..."></textarea></div><div class="text-center"><button type="submit" class="btn btn-accent">Enviar Comentario</button></div></form></section>
+            <section id="feedback" class="card mt-8"><h3 class="text-2xl font-bold text-gray-800 text-center" data-translate-key="feedback_title">Tu opinión nos hace mejores</h3><p class="mt-2 text-gray-600 text-center max-w-2xl mx-auto" data-translate-key="feedback_subtitle">¿Tienes sugerencias o quieres reportar una incidencia? ¡Cuéntanos!</p><form id="feedback-form" class="mt-6 max-w-xl mx-auto space-y-4"><div><label for="feedback-message" class="sr-only" data-translate-key="feedback_placeholder">Tu mensaje</label><textarea id="feedback-message" rows="4" class="w-full p-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500" placeholder="Escribe tu mensaje aquí..." data-translate-key="feedback_placeholder_attr"></textarea></div><div class="text-center"><button type="submit" class="btn btn-accent" data-translate-key="feedback_button">Enviar Comentario</button></div></form></section>
         </main>
         
-        <footer class="bg-gray-800 text-white mt-16"><div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10"><div class="text-center mb-8"><p class="text-xl italic">"La edad es solo un número. Las aventuras son para siempre."</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-b border-gray-700 pb-8"><div class="text-center md:text-left"><h4 class="text-2xl font-bold">Movimiento Plateado</h4><p class="mt-2 text-gray-300 max-w-md">Red inclusiva, activa, propositiva y participativa para la Vida Plena.</p></div><div class="flex flex-col items-center md:items-end"><p class="font-semibold mb-3">Síguenos y contáctanos:</p><div class="flex space-x-5"><a href="https://movimientoplateado.com/" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" aria-label="Sitio web de Movimiento Plateado"><i data-feather="globe" class="w-7 h-7"></i></a><a href="https://www.facebook.com/profile.php?id=61573086449893" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" aria-label="Facebook de Club Plateado"><i data-feather="facebook" class="w-7 h-7"></i></a><a href="https://www.youtube.com/@MovimientoPlateado" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" aria-label="YouTube de Movimiento Plateado"><i data-feather="youtube" class="w-7 h-7"></i></a><a href="https://www.linkedin.com/in/ramiropaniagua" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" aria-label="LinkedIn de Ramiro Paniagua"><i data-feather="linkedin" class="w-7 h-7"></i></a><a href="mailto:movimientoplateado@gmail.com" class="hover:text-blue-400 transition-colors" aria-label="Enviar correo a Movimiento Plateado"><i data-feather="mail" class="w-7 h-7"></i></a></div></div></div><div class="py-8"><h5 class="text-center text-lg font-semibold text-gray-300 mb-6">Accede rápidamente con tu cámara</h5><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 justify-items-center"><div class="text-center"><a href="https://movimientoplateado.com/" target="_blank" rel="noopener noreferrer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://movimientoplateado.com/" alt="QR Code para Sitio Web Movimiento Plateado" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400">Sitio Web</p></div><div class="text-center"><a href="https://www.facebook.com/profile.php?id=61573086449893" target="_blank" rel="noopener noreferrer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.facebook.com/profile.php?id=61573086449893" alt="QR Code para Facebook Club Plateado" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400">Facebook</p></div><div class="text-center"><a href="https://www.youtube.com/@MovimientoPlateado" target="_blank" rel="noopener noreferrer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.youtube.com/@MovimientoPlateado" alt="QR Code para YouTube Movimiento Plateado" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400">YouTube</p></div><div class="text-center"><a href="https://www.linkedin.com/in/ramiropaniagua" target="_blank" rel="noopener noreferrer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.linkedin.com/in/ramiropaniagua" alt="QR Code para LinkedIn Ramiro Paniagua" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400">LinkedIn</p></div><div class="text-center col-span-2 sm:col-span-1 md:col-span-1"><a href="mailto:movimientoplateado@gmail.com"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=mailto:movimientoplateado@gmail.com" alt="QR Code para Correo Electrónico" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400">Email</p></div></div></div><div class="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm"><p>Desarrollado con ♥ para <a href="https://movimientoplateado.com/" target="_blank" rel="noopener noreferrer" class="font-semibold hover:text-white">Movimiento Plateado</a>.</p><p>&copy; 2024 MiGuIA. Todos los derechos reservados.</p></div></div></footer>
-
+        <footer class="bg-gray-800 text-white mt-16"><div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10"><div class="text-center mb-8"><p class="text-xl italic" data-translate-key="footer_quote">"La edad es solo un número. Las aventuras son para siempre."</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-b border-gray-700 pb-8"><div class="text-center md:text-left"><h4 class="text-2xl font-bold">Movimiento Plateado</h4><p class="mt-2 text-gray-300 max-w-md" data-translate-key="footer_description">Red inclusiva, activa, propositiva y participativa para la Vida Plena.</p></div><div class="flex flex-col items-center md:items-end"><p class="font-semibold mb-3" data-translate-key="footer_follow">Síguenos y contáctanos:</p><div class="flex space-x-5"><a href="https://movimientoplateado.com/" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" aria-label="Sitio web de Movimiento Plateado"><i data-feather="globe" class="w-7 h-7"></i></a><a href="https://www.facebook.com/profile.php?id=61573086449893" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" aria-label="Facebook de Club Plateado"><i data-feather="facebook" class="w-7 h-7"></i></a><a href="https://www.youtube.com/@MovimientoPlateado" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" aria-label="YouTube de Movimiento Plateado"><i data-feather="youtube" class="w-7 h-7"></i></a><a href="https://www.linkedin.com/in/ramiropaniagua" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 transition-colors" aria-label="LinkedIn de Ramiro Paniagua"><i data-feather="linkedin" class="w-7 h-7"></i></a><a href="mailto:movimientoplateado@gmail.com" class="hover:text-blue-400 transition-colors" aria-label="Enviar correo a Movimiento Plateado"><i data-feather="mail" class="w-7 h-7"></i></a></div></div></div><div class="py-8"><h5 class="text-center text-lg font-semibold text-gray-300 mb-6" data-translate-key="footer_qr_title">Accede rápidamente con tu cámara</h5><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 justify-items-center"><div class="text-center"><a href="https://movimientoplateado.com/" target="_blank" rel="noopener noreferrer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://movimientoplateado.com/" alt="QR Code para Sitio Web Movimiento Plateado" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400" data-translate-key="footer_qr_website">Sitio Web</p></div><div class="text-center"><a href="https://www.facebook.com/profile.php?id=61573086449893" target="_blank" rel="noopener noreferrer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.facebook.com/profile.php?id=61573086449893" alt="QR Code para Facebook Club Plateado" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400">Facebook</p></div><div class="text-center"><a href="https://www.youtube.com/@MovimientoPlateado" target="_blank" rel="noopener noreferrer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.youtube.com/@MovimientoPlateado" alt="QR Code para YouTube Movimiento Plateado" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400">YouTube</p></div><div class="text-center"><a href="https://www.linkedin.com/in/ramiropaniagua" target="_blank" rel="noopener noreferrer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.linkedin.com/in/ramiropaniagua" alt="QR Code para LinkedIn Ramiro Paniagua" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400">LinkedIn</p></div><div class="text-center col-span-2 sm:col-span-1 md:col-span-1"><a href="mailto:movimientoplateado@gmail.com"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=mailto:movimientoplateado@gmail.com" alt="QR Code para Correo Electrónico" class="bg-white p-1 rounded-md mx-auto"></a><p class="mt-2 text-xs text-gray-400" data-translate-key="footer_qr_email">Email</p></div></div></div><div class="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm"><p data-translate-key="footer_developed_by">Desarrollado con ♥ para <a href="https://movimientoplateado.com/" target="_blank" rel="noopener noreferrer" class="font-semibold hover:text-white">Movimiento Plateado</a>.</p><p>&copy; 2024 MiGuIA. <span data-translate-key="footer_rights">Todos los derechos reservados.</span></p></div></div></footer>
     </div>
 
     <!-- MODAL PARA DETALLES DEL BENEFICIO -->
     <div id="benefit-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4 hidden"><div id="modal-content" class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto no-scrollbar relative"></div></div>
 
+    <!-- NOTIFICACIÓN (TOAST) PARA FEEDBACK -->
+    <div id="feedback-toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-3 px-5 rounded-lg shadow-xl opacity-0 transform translate-y-10">
+        <p data-translate-key="feedback_toast_message">¡Mensaje enviado con éxito!</p>
+    </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- SELECTORES DEL DOM ---
         const select = (selector) => document.querySelector(selector);
         const selectAll = (selector) => document.querySelectorAll(selector);
 
+        // --- DICCIONARIO DE TRADUCCIONES ---
+        const translations = {
+            ES: {
+                access_title: 'Bienvenido/a a MiGuIA',
+                access_subtitle: 'Tu Hub de Beneficios para un Turismo Sin Edadismo.',
+                access_email_placeholder: 'Escribe tu correo electrónico',
+                access_human_check: 'Soy humano',
+                access_button: 'Ingresar',
+                access_security_note: 'Por tu seguridad, la sesión expirará tras 5 minutos de inactividad.',
+                menu_title: 'Movimiento Plateado',
+                menu_apps: 'Aplicaciones',
+                menu_app_manifiesto: 'Manifiesto Plateado',
+                menu_app_club: 'Formulario Club Plateado',
+                menu_app_ciber_riesgo: 'Consulta Si Riesgo CiberSeguridad',
+                menu_app_ciber_acciones: 'Consulta Acciones Ciberseguridad',
+                menu_app_atencion: 'Consulta Atención Básica',
+                menu_app_sudoku: 'Sudoku',
+                menu_pilots: 'Pilotos',
+                menu_pilot_geronto: 'Conceptual Gerontología',
+                menu_pilot_detector: 'Detector de Objeto Entorno',
+                menu_pilot_antioquia: 'Antioquia, IA y Gerontología',
+                menu_pilot_sentimientos: 'Análisis de Sentimientos en la Voz',
+                header_author: 'Por: <strong>Ramiro A Paniagua G.</strong> para Movimiento Plateado',
+                header_tags: 'Etiquetas:',
+                tag_senior_tourism: 'Turismo Senior',
+                nav_benefits: 'Buscador de Beneficios',
+                nav_advice: 'Asesoramiento Humano',
+                nav_insurance: 'Seguros de Viaje',
+                nav_feedback: 'Envíanos tus Comentarios',
+                benefits_title: 'Hub de Beneficios Sénior',
+                benefits_subtitle: 'Encuentra y aprovecha todos los descuentos y servicios prioritarios para tu próximo viaje.',
+                filter_search_label: 'Buscar por destino o palabra clave',
+                filter_search_placeholder: 'Ej: Madrid, museo, tren',
+                filter_category_label: 'Categoría',
+                filter_cat_all: 'Todas las categorías',
+                filter_cat_transport: 'Transporte',
+                filter_cat_lodging: 'Alojamiento',
+                filter_cat_attractions: 'Atracciones y Cultura',
+                filter_cat_gov: 'Programas Gubernamentales',
+                filter_clear_button: 'Limpiar filtros',
+                no_results_title: 'Sin resultados',
+                no_results_subtitle: 'Intenta con otros filtros o palabras clave.',
+                advice_title: 'Asesoramiento Humano y Directo',
+                advice_subtitle: 'Nuestros expertos están listos para ayudarte a planificar tu viaje y resolver cualquier duda.',
+                insurance_title: 'Viaja con Tranquilidad',
+                insurance_subtitle: 'Recomendamos siempre contratar un seguro de viaje adecuado.',
+                insurance_button: 'Ver opciones de seguro',
+                feedback_title: 'Tu opinión nos hace mejores',
+                feedback_subtitle: '¿Tienes sugerencias o quieres reportar una incidencia? ¡Cuéntanos!',
+                feedback_placeholder: 'Tu mensaje',
+                feedback_placeholder_attr: 'Escribe tu mensaje aquí...',
+                feedback_button: 'Enviar Comentario',
+                footer_quote: '"La edad es solo un número. Las aventuras son para siempre."',
+                footer_description: 'Red inclusiva, activa, propositiva y participativa para la Vida Plena.',
+                footer_follow: 'Síguenos y contáctanos:',
+                footer_qr_title: 'Accede rápidamente con tu cámara',
+                footer_qr_website: 'Sitio Web',
+                footer_qr_email: 'Email',
+                footer_developed_by: 'Desarrollado con ♥ para <a href="https://movimientoplateado.com/" target="_blank" rel="noopener noreferrer" class="font-semibold hover:text-white">Movimiento Plateado</a>.',
+                footer_rights: 'Todos los derechos reservados.',
+                feedback_toast_message: '¡Mensaje enviado con éxito!',
+                modal_benefit_details_button: 'Ver más detalles'
+            },
+            EN: {
+                access_title: 'Welcome to MiGuIA',
+                access_subtitle: 'Your Hub of Benefits for Ageless Tourism.',
+                access_email_placeholder: 'Enter your email address',
+                access_human_check: 'I am human',
+                access_button: 'Enter',
+                access_security_note: 'For your security, the session will expire after 5 minutes of inactivity.',
+                menu_title: 'Movimiento Plateado',
+                menu_apps: 'Applications',
+                menu_app_manifiesto: 'Plateado Manifesto',
+                menu_app_club: 'Club Plateado Form',
+                menu_app_ciber_riesgo: 'Cybersecurity Risk Check',
+                menu_app_ciber_acciones: 'Cybersecurity Actions Check',
+                menu_app_atencion: 'Basic Care Check',
+                menu_app_sudoku: 'Sudoku',
+                menu_pilots: 'Pilots',
+                menu_pilot_geronto: 'Gerontology Concept',
+                menu_pilot_detector: 'Environment Object Detector',
+                menu_pilot_antioquia: 'Antioquia, AI & Gerontology',
+                menu_pilot_sentimientos: 'Voice Sentiment Analysis',
+                header_author: 'By: <strong>Ramiro A Paniagua G.</strong> for Movimiento Plateado',
+                header_tags: 'Tags:',
+                tag_senior_tourism: 'Senior Tourism',
+                nav_benefits: 'Benefit Finder',
+                nav_advice: 'Human Advice',
+                nav_insurance: 'Travel Insurance',
+                nav_feedback: 'Send us your Feedback',
+                benefits_title: 'Senior Benefits Hub',
+                benefits_subtitle: 'Find and take advantage of all discounts and priority services for your next trip.',
+                filter_search_label: 'Search by destination or keyword',
+                filter_search_placeholder: 'E.g., London, museum, train',
+                filter_category_label: 'Category',
+                filter_cat_all: 'All categories',
+                filter_cat_transport: 'Transport',
+                filter_cat_lodging: 'Lodging',
+                filter_cat_attractions: 'Attractions & Culture',
+                filter_cat_gov: 'Government Programs',
+                filter_clear_button: 'Clear filters',
+                no_results_title: 'No results',
+                no_results_subtitle: 'Try different filters or keywords.',
+                advice_title: 'Direct Human Advice',
+                advice_subtitle: 'Our experts are ready to help you plan your trip and answer any questions.',
+                insurance_title: 'Travel with Peace of Mind',
+                insurance_subtitle: 'We always recommend getting adequate travel insurance.',
+                insurance_button: 'See insurance options',
+                feedback_title: 'Your opinion makes us better',
+                feedback_subtitle: 'Have suggestions or want to report an issue? Let us know!',
+                feedback_placeholder: 'Your message',
+                feedback_placeholder_attr: 'Write your message here...',
+                feedback_button: 'Send Feedback',
+                footer_quote: '"Age is just a number. Adventures are forever."',
+                footer_description: 'An inclusive, active, proactive, and participatory network for a Full Life.',
+                footer_follow: 'Follow and contact us:',
+                footer_qr_title: 'Quick access with your camera',
+                footer_qr_website: 'Website',
+                footer_qr_email: 'Email',
+                footer_developed_by: 'Developed with ♥ for <a href="https://movimientoplateado.com/" target="_blank" rel="noopener noreferrer" class="font-semibold hover:text-white">Movimiento Plateado</a>.',
+                footer_rights: 'All rights reserved.',
+                feedback_toast_message: 'Message sent successfully!',
+                modal_benefit_details_button: 'View more details'
+            }
+        };
+        
+        // --- SELECTORES DEL DOM ---
         const accessScreen = select('#access-screen');
         const mainApp = select('#main-app');
         const accessButton = select('#access-button');
@@ -270,33 +406,57 @@
         const clearFiltersButton = select('#clear-filters');
         const benefitModal = select('#benefit-modal');
         const modalContent = select('#modal-content');
+        const feedbackForm = select('#feedback-form');
+        const feedbackToast = select('#feedback-toast');
         
-        // Menú Principal (Sandwich)
+        // Menús y navegación
         const openMainMenuBtn = select('#open-main-menu');
         const closeMainMenuBtn = select('#close-main-menu');
         const mainMenuPanel = select('#main-menu-panel');
         const mainMenuBackdrop = select('#main-menu-backdrop');
-        
-        // Menú de Navegación Móvil (Página actual)
         const mobileMenuButton = select('#mobile-menu-button');
         const navigationMenu = select('#navigation-menu');
 
-        // Selector de Idioma
+        // Idioma
         const langSelectorBtn = select('#lang-selector-btn');
         const langDropdown = select('#lang-dropdown');
+        const langDisplay = select('#lang-display');
         
         // --- ESTADO Y CONFIGURACIÓN ---
         let sessionTimerInterval;
-        const SESSION_DURATION = 5 * 60; // 5 minutos en segundos
+        const SESSION_DURATION = 5 * 60; 
+        let currentLang = 'ES'; 
 
-        // Base de datos de ejemplo
-        const benefitsData = [
-            { id: 1, title: 'Descuento RENFE "Tarjeta Dorada"', category: 'Transporte', destination: 'España', summary: 'Viaja en tren por España con hasta un 40% de descuento. Para mayores de 60 años.', description: 'La Tarjeta Dorada de RENFE está destinada a mayores de 60 años, pensionistas y personas con discapacidad, ofreciendo importantes descuentos en todo tipo de trenes.', requirements: 'Ser mayor de 60 años, pensionista o persona con discapacidad acreditada. Se adquiere en estaciones RENFE o agencias de viaje.', savings: 'Entre 25% y 40% de descuento dependiendo del tipo de tren y el día de la semana.', howto: '1. Adquirir la Tarjeta Dorada (coste anual de 6€).\n2. Presentar la tarjeta al comprar billetes online, en taquilla o máquinas autoventa.\n3. ¡Disfrutar del viaje!', icon: 'train' },
-            { id: 2, title: 'IMSERSO: Turismo Social', category: 'Gobierno', destination: 'España', summary: 'Programa del Gobierno de España para viajar a precios muy reducidos en temporada baja.', description: 'El Programa de Turismo del Imserso fomenta el envejecimiento activo y las estancias en zonas costeras y de interior a precios excepcionales para pensionistas.', requirements: 'Ser pensionista de jubilación del sistema de Seguridad Social español, o viudedad con 55+ años, entre otros requisitos. Se solicita en plazos específicos.', savings: 'Subvenciones de hasta el 50-70% del coste real del viaje.', howto: '1. Cumplir los requisitos.\n2. Presentar la solicitud en los plazos oficiales.\n3. Una vez acreditado, elegir y reservar el destino deseado.', icon: 'sun' },
-            { id: 3, title: 'Entrada Reducida Museos Nacionales', category: 'Atracciones', destination: 'Colombia', summary: 'Acceso con tarifa reducida a los museos gestionados por el Ministerio de Cultura.', description: 'Los adultos mayores de 60 años gozan de tarifas especiales para acceder a la riqueza cultural de los museos nacionales en toda Colombia.', requirements: 'Presentar documento de identidad que acredite ser mayor de 60 años.', savings: 'Descuentos de hasta el 50% o entrada gratuita en algunos casos.', howto: 'Solicitar la tarifa de adulto mayor en la taquilla del museo presentando el documento de identidad.', icon: 'award' },
-        ];
+        const benefitsData = {
+            ES: [
+                { id: 1, title: 'Descuento RENFE "Tarjeta Dorada"', category: 'Transporte', destination: 'España', summary: 'Viaja en tren por España con hasta un 40% de descuento. Para mayores de 60 años.', description: 'La Tarjeta Dorada de RENFE está destinada a mayores de 60 años, pensionistas y personas con discapacidad, ofreciendo importantes descuentos en todo tipo de trenes.', requirements: 'Ser mayor de 60 años, pensionista o persona con discapacidad acreditada. Se adquiere en estaciones RENFE o agencias de viaje.', savings: 'Entre 25% y 40% de descuento dependiendo del tipo de tren y el día de la semana.', howto: '1. Adquirir la Tarjeta Dorada (coste anual de 6€).\n2. Presentar la tarjeta al comprar billetes online, en taquilla o máquinas autoventa.\n3. ¡Disfrutar del viaje!', icon: 'train' },
+                { id: 2, title: 'IMSERSO: Turismo Social', category: 'Gobierno', destination: 'España', summary: 'Programa del Gobierno de España para viajar a precios muy reducidos en temporada baja.', description: 'El Programa de Turismo del Imserso fomenta el envejecimiento activo y las estancias en zonas costeras y de interior a precios excepcionales para pensionistas.', requirements: 'Ser pensionista de jubilación del sistema de Seguridad Social español, o viudedad con 55+ años, entre otros requisitos. Se solicita en plazos específicos.', savings: 'Subvenciones de hasta el 50-70% del coste real del viaje.', howto: '1. Cumplir los requisitos.\n2. Presentar la solicitud en los plazos oficiales.\n3. Una vez acreditado, elegir y reservar el destino deseado.', icon: 'sun' },
+            ],
+            EN: [
+                 { id: 1, title: 'RENFE "Gold Card" Discount', category: 'Transport', destination: 'Spain', summary: 'Travel by train through Spain with up to 40% discount. For people over 60.', description: 'The RENFE Gold Card is for people over 60, pensioners, and people with disabilities, offering significant discounts on all types of trains.', requirements: 'Be over 60, a pensioner, or have a certified disability. It can be purchased at RENFE stations or travel agencies.', savings: 'Between 25% and 40% discount depending on the train type and day of the week.', howto: '1. Purchase the Gold Card (annual cost of €6).\n2. Present the card when buying tickets online, at the ticket office, or at self-service machines.\n3. Enjoy the trip!', icon: 'train' },
+                { id: 2, title: 'IMSERSO: Social Tourism', category: 'Government', destination: 'Spain', summary: 'Spanish Government program to travel at very low prices in the off-season.', description: 'The Imserso Tourism Program promotes active aging and stays in coastal and inland areas at exceptional prices for pensioners.', requirements: 'Be a retirement pensioner of the Spanish Social Security system, or a widow(er) aged 55+, among other requirements. Application is during specific periods.', savings: 'Subsidies of up to 50-70% of the real cost of the trip.', howto: '1. Meet the requirements.\n2. Submit the application during the official periods.\n3. Once accredited, choose and book the desired destination.', icon: 'sun' },
+            ]
+        };
 
         // --- FUNCIONES ---
+        
+        function translatePage(lang) {
+            currentLang = lang;
+            const langTranslations = translations[lang];
+            selectAll('[data-translate-key]').forEach(el => {
+                const key = el.dataset.translateKey;
+                if (langTranslations[key]) {
+                    if (el.hasAttribute('data-translate-key-attr')) {
+                         el.setAttribute(el.dataset.translateKeyAttr, langTranslations[key]);
+                    } else {
+                        el.innerHTML = langTranslations[key];
+                    }
+                }
+            });
+            langDisplay.textContent = lang;
+            document.documentElement.lang = lang.toLowerCase();
+            renderBenefits(benefitsData[currentLang]); // Re-render benefits in the new language
+        }
 
         const isValidEmail = (email) => /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
 
@@ -304,7 +464,7 @@
             accessScreen.classList.add('hidden');
             mainApp.classList.remove('hidden');
             feather.replace(); 
-            renderBenefits(benefitsData);
+            translatePage(currentLang); // Initial translation
             resetSessionTimer();
             setupActivityListeners();
             adjustStickyPosition();
@@ -339,12 +499,13 @@
 
         function renderBenefits(data) {
             benefitsList.innerHTML = '';
-            noResults.classList.toggle('hidden', data.length > 0);
+            noResults.classList.toggle('hidden', !data || data.length === 0);
+            if (!data) return;
             
             data.forEach(benefit => {
                 const card = document.createElement('div');
                 card.className = 'card flex flex-col';
-                card.innerHTML = `<div class="flex-grow"><div class="flex items-center space-x-3 mb-3"><i data-feather="${benefit.icon}" class="w-6 h-6 text-blue-600"></i><span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${benefit.category}</span></div><h4 class="text-xl font-bold text-gray-800 mb-2">${benefit.title}</h4><p class="text-gray-600">${benefit.summary}</p></div><div class="mt-4"><button class="btn btn-accent w-full view-details" data-id="${benefit.id}">Ver más detalles</button></div>`;
+                card.innerHTML = `<div class="flex-grow"><div class="flex items-center space-x-3 mb-3"><i data-feather="${benefit.icon}" class="w-6 h-6 text-blue-600"></i><span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${benefit.category}</span></div><h4 class="text-xl font-bold text-gray-800 mb-2">${benefit.title}</h4><p class="text-gray-600">${benefit.summary}</p></div><div class="mt-4"><button class="btn btn-accent w-full view-details" data-id="${benefit.id}">${translations[currentLang].modal_benefit_details_button}</button></div>`;
                 benefitsList.appendChild(card);
             });
             feather.replace();
@@ -354,21 +515,11 @@
             });
         }
 
-        function filterAndSearch() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const category = categoryFilter.value;
-            const filteredData = benefitsData.filter(benefit => 
-                (category === 'all' || benefit.category === category) &&
-                (benefit.title.toLowerCase().includes(searchTerm) || benefit.destination.toLowerCase().includes(searchTerm) || benefit.description.toLowerCase().includes(searchTerm))
-            );
-            renderBenefits(filteredData);
-        }
-        
         function openModal(benefitId) {
-            const benefit = benefitsData.find(b => b.id === benefitId);
+            const benefit = benefitsData[currentLang].find(b => b.id === benefitId);
             if (!benefit) return;
 
-            modalContent.innerHTML = `<button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800" aria-label="Cerrar ventana modal"><i data-feather="x" class="w-8 h-8"></i></button><div class="p-8"><div class="flex items-center space-x-4 mb-4"><div class="bg-blue-100 p-3 rounded-full"><i data-feather="${benefit.icon}" class="w-10 h-10 text-blue-600"></i></div><div><h3 class="text-3xl font-bold text-gray-800">${benefit.title}</h3><p class="text-lg text-gray-500">${benefit.destination} - ${benefit.category}</p></div></div><div class="space-y-6 text-lg text-gray-700 mt-6"><div><h5 class="font-bold text-xl mb-1">Descripción</h5><p>${benefit.description}</p></div><div><h5 class="font-bold text-xl mb-1">Requisitos</h5><p>${benefit.requirements}</p></div><div><h5 class="font-bold text-xl mb-1">Ahorro estimado</h5><p class="font-semibold text-green-600">${benefit.savings}</p></div><div><h5 class="font-bold text-xl mb-1">¿Cómo solicitarlo?</h5><p class="whitespace-pre-line">${benefit.howto}</p></div></div></div>`;
+            modalContent.innerHTML = `<button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800" aria-label="Cerrar ventana modal"><i data-feather="x" class="w-8 h-8"></i></button><div class="p-8"><div class="flex items-center space-x-4 mb-4"><div class="bg-blue-100 p-3 rounded-full"><i data-feather="${benefit.icon}" class="w-10 h-10 text-blue-600"></i></div><div><h3 class="text-3xl font-bold text-gray-800">${benefit.title}</h3><p class="text-lg text-gray-500">${benefit.destination} - ${benefit.category}</p></div></div><div class="space-y-6 text-lg text-gray-700 mt-6"><div><h5 class="font-bold text-xl mb-1">${currentLang === 'ES' ? 'Descripción' : 'Description'}</h5><p>${benefit.description}</p></div><div><h5 class="font-bold text-xl mb-1">${currentLang === 'ES' ? 'Requisitos' : 'Requirements'}</h5><p>${benefit.requirements}</p></div><div><h5 class="font-bold text-xl mb-1">${currentLang === 'ES' ? 'Ahorro estimado' : 'Estimated Savings'}</h5><p class="font-semibold text-green-600">${benefit.savings}</p></div><div><h5 class="font-bold text-xl mb-1">${currentLang === 'ES' ? '¿Cómo solicitarlo?' : 'How to Apply?'}</h5><p class="whitespace-pre-line">${benefit.howto}</p></div></div></div>`;
             benefitModal.classList.remove('hidden');
             feather.replace();
             select('#close-modal').addEventListener('click', closeModal);
@@ -384,12 +535,14 @@
         function adjustStickyPosition() {
             const headerHeight = select('#app-header').offsetHeight;
             const navHeight = navigationMenu.classList.contains('hidden') ? 0 : navigationMenu.offsetHeight;
-            const totalOffset = headerHeight + navHeight;
-            select('#filters-container').style.top = `${totalOffset}px`;
-            
-            selectAll('section[id]').forEach(section => {
-                 section.style.scrollMarginTop = `${totalOffset + 16}px`;
-            });
+            select('#filters-container').style.top = `${headerHeight + navHeight}px`;
+        }
+
+        function showFeedbackToast() {
+            feedbackToast.classList.remove('opacity-0', 'translate-y-10');
+            setTimeout(() => {
+                feedbackToast.classList.add('opacity-0', 'translate-y-10');
+            }, 3000);
         }
         
         // --- EVENT LISTENERS ---
@@ -405,18 +558,25 @@
             startApp();
         });
 
-        searchInput.addEventListener('input', filterAndSearch);
-        categoryFilter.addEventListener('change', filterAndSearch);
+        selectAll('.lang-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                translatePage(e.target.dataset.lang);
+                langDropdown.classList.add('hidden');
+            });
+        });
+
+        searchInput.addEventListener('input', () => renderBenefits(benefitsData[currentLang].filter(b => b.title.toLowerCase().includes(searchInput.value.toLowerCase()))));
+        categoryFilter.addEventListener('change', () => renderBenefits(benefitsData[currentLang].filter(b => categoryFilter.value === 'all' || b.category === translations.ES[Object.keys(translations.ES).find(k => translations.ES[k] === categoryFilter.value)] || b.category === translations.EN[Object.keys(translations.EN).find(k => translations.EN[k] === categoryFilter.value)])));
         clearFiltersButton.addEventListener('click', () => {
             searchInput.value = '';
             categoryFilter.value = 'all';
-            renderBenefits(benefitsData);
+            renderBenefits(benefitsData[currentLang]);
         });
         
         benefitModal.addEventListener('click', (e) => { if (e.target === benefitModal) closeModal(); });
         window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !benefitModal.classList.contains('hidden')) closeModal(); });
 
-        // Listeners para menús
         openMainMenuBtn.addEventListener('click', () => toggleMainMenu(true));
         closeMainMenuBtn.addEventListener('click', () => toggleMainMenu(false));
         mainMenuBackdrop.addEventListener('click', () => toggleMainMenu(false));
@@ -427,19 +587,22 @@
             adjustStickyPosition();
         });
 
-        // Listener para selector de idioma
         langSelectorBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             langDropdown.classList.toggle('hidden');
         });
         document.addEventListener('click', () => langDropdown.classList.add('hidden'));
 
-        // Listeners para navegación suave y ajuste de sticky
         selectAll('.nav-link').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetElement = select(this.getAttribute('href'));
-                if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth' });
+                if (targetElement) {
+                    const headerOffset = select('#app-header').offsetHeight + (navigationMenu.classList.contains('hidden') ? 0 : navigationMenu.offsetHeight);
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset - 20;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                }
                 if (!navigationMenu.classList.contains('md:block')) {
                     navigationMenu.classList.add('hidden');
                     adjustStickyPosition();
@@ -447,7 +610,21 @@
             });
         });
 
+        feedbackForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userEmail = emailInput.value.trim();
+            const message = select('#feedback-message').value;
+            console.log(`Simulando envío de correo a movimientoplateado@gmail.com`);
+            console.log(`De: ${userEmail}`);
+            console.log(`Mensaje: ${message}`);
+            showFeedbackToast();
+            select('#feedback-message').value = '';
+        });
+
         window.addEventListener('resize', adjustStickyPosition);
+        
+        // Carga inicial
+        translatePage('ES');
     });
     </script>
 </body>
