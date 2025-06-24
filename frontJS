@@ -1,0 +1,155 @@
+/**
+ * NOTE: This script assumes you have initialized the Firebase SDK in your HTML already.
+ * * Example Firebase initialization (should be in your HTML before this script):
+ * * <!-- Firebase SDK -->
+ * <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+ * <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-functions-compat.js"></script>
+ * * <script>
+ * // Your web app's Firebase configuration
+ * const firebaseConfig = {
+ * apiKey: "YOUR_API_KEY",
+ * authDomain: "YOUR_AUTH_DOMAIN",
+ * projectId: "YOUR_PROJECT_ID",
+ * storageBucket: "YOUR_STORAGE_BUCKET",
+ * messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+ * appId: "YOUR_APP_ID"
+ * };
+ * // Initialize Firebase
+ * firebase.initializeApp(firebaseConfig);
+ * </script>
+ * */
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    // --- Firebase Functions Initializer ---
+    // Initialize Cloud Functions through Firebase
+    const functions = firebase.functions();
+
+    // --- DOM Element Selectors ---
+    const feedbackForm = document.getElementById('feedback-form');
+    const feedbackMessageTextarea = document.getElementById('feedback-message');
+    const feedbackButton = feedbackForm.querySelector('button[type="submit"]');
+    
+    // Example of a results container. You would create this in your HTML.
+    // <div id="analysis-results-container"></div>
+    const resultsContainer = document.getElementById('analysis-results-container') || document.body;
+
+
+    /**
+     * Handles the feedback form submission to analyze the text.
+     * @param {Event} e The form submission event.
+     */
+    async function handleAnalysisRequest(e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        const textToAnalyze = feedbackMessageTextarea.value.trim();
+        const originalButtonText = feedbackButton.innerHTML;
+
+        // Basic validation: Ensure there is text to analyze
+        if (!textToAnalyze) {
+            alert('Por favor, ingresa un texto para analizar.'); // Replace with a custom modal in production
+            return;
+        }
+
+        try {
+            // --- UI Update: Show Loading State ---
+            // Disable button and show a loading message/spinner
+            feedbackButton.disabled = true;
+            feedbackButton.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Analizando...
+            `;
+            resultsContainer.innerHTML = ''; // Clear previous results
+
+            // --- Call the Firebase Cloud Function ---
+            // Get the callable function reference
+            const analyzeWithGemini = functions.httpsCallable('analyzeWithGemini');
+            
+            // Call the function with the text to analyze
+            const result = await analyzeWithGemini({ text: textToAnalyze });
+
+            // The 'result.data' contains the structured response from your Cloud Function
+            const analysis = result.data;
+
+            // --- UI Update: Display Results ---
+            displayAnalysisResults(analysis);
+
+        } catch (error) {
+            // --- UI Update: Show Error State ---
+            console.error('Error calling Cloud Function:', error);
+            // Display a user-friendly error message in the UI
+            resultsContainer.innerHTML = `
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
+                    <p class="font-bold">Error en el Análisis</p>
+                    <p>No se pudo completar el análisis. Por favor, inténtalo de nuevo más tarde. Error: ${error.message}</p>
+                </div>
+            `;
+        } finally {
+            // --- UI Update: Restore Button ---
+            // Re-enable the button and restore its original text, regardless of success or failure
+            feedbackButton.disabled = false;
+            feedbackButton.innerHTML = originalButtonText;
+        }
+    }
+
+    /**
+     * Renders the analysis results from Gemini into the UI.
+     * @param {object} analysis - The structured analysis object from the backend.
+     */
+    function displayAnalysisResults(analysis) {
+        // Example: This function assumes 'analysis' is an object like:
+        // { riskScore: 85, summary: "...", sentiment: "Negative" }
+        // You should adapt this to the actual structure returned by your Gemini prompt.
+
+        let riskColorClass = 'bg-green-100 border-green-500 text-green-800';
+        if (analysis.riskScore > 80) {
+            riskColorClass = 'bg-red-100 border-red-500 text-red-700';
+        } else if (analysis.riskScore > 60) {
+            riskColorClass = 'bg-orange-100 border-orange-500 text-orange-700';
+        } else if (analysis.riskScore > 40) {
+            riskColorClass = 'bg-yellow-100 border-yellow-500 text-yellow-700';
+        }
+
+        const resultsHTML = `
+            <div class="mt-6 p-4 border rounded-lg bg-white shadow-sm">
+                <h4 class="text-xl font-bold text-gray-800 mb-4">Resultados del Análisis</h4>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-500">Nivel de Riesgo de Ciberseguridad</label>
+                    <div class="w-full bg-gray-200 rounded-full h-6 mt-1">
+                        <div class="${riskColorClass.split(' ')[0]} h-6 rounded-full flex items-center justify-center font-bold text-sm" style="width: ${analysis.riskScore}%">
+                            ${analysis.riskScore}%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-md border ${riskColorClass}">
+                    <h5 class="font-bold">Resumen del Análisis de IA:</h5>
+                    <p class="mt-1">${analysis.summary || 'No se proporcionó un resumen.'}</p>
+                </div>
+
+                 <div class="mt-4">
+                    <p><span class="font-semibold">Sentimiento Detectado:</span> ${analysis.sentiment || 'No determinado'}</p>
+                </div>
+            </div>
+        `;
+
+        // Assuming you have a container with id="analysis-results-container"
+        // This could be placed right after the feedback form.
+        if (resultsContainer) {
+            resultsContainer.innerHTML = resultsHTML;
+        } else {
+             // As a fallback, append to the form's parent
+            feedbackForm.parentElement.insertAdjacentHTML('beforeend', resultsHTML);
+        }
+    }
+
+    // Attach the event listener to the form.
+    // We are reusing the feedback form for this analysis functionality as per the request context.
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', handleAnalysisRequest);
+    }
+});

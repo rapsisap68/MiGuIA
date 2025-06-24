@@ -1,0 +1,116 @@
+// Import the necessary modules.
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const { GoogleAuth } = require('google-auth-library');
+const fetch = require('node-fetch');
+
+// Initialize the Firebase Admin SDK.
+// This is required to interact with Firebase services from the backend.
+admin.initializeApp();
+
+/**
+ * A secure, callable Cloud Function to analyze text using the Gemini API.
+ * This function is invoked from the client-side code.
+ *
+ * @param {object} data - The data passed from the client. Expected to have a 'text' property.
+ * @param {functions.https.CallableContext} context - The context of the function call.
+ * @returns {Promise<object>} A promise that resolves with the structured analysis result.
+ */
+exports.analyzeWithGemini = functions.https.onCall(async (data, context) => {
+    // Optional: Check if the user is authenticated.
+    // For a public-facing app, you might remove this or implement rate limiting.
+    // if (!context.auth) {
+    //     throw new functions.https.HttpsError(
+    //         'unauthenticated',
+    //         'The function must be called while authenticated.'
+    //     );
+    // }
+
+    const textToAnalyze = data.text;
+    if (!textToAnalyze || typeof textToAnalyze !== 'string' || textToAnalyze.trim().length === 0) {
+        throw new functions.https.HttpsError(
+            'invalid-argument',
+            'The function must be called with a non-empty "text" argument.'
+        );
+    }
+
+    try {
+        // --- Securely get credentials ---
+        // This uses Application Default Credentials, which is the recommended way
+        // on Google Cloud environments like Cloud Functions.
+        const auth = new GoogleAuth({
+            scopes: 'https://www.googleapis.com/auth/cloud-platform'
+        });
+        const client = await auth.getClient();
+        const accessToken = (await client.getAccessToken()).token;
+
+        // --- Get Project ID and Model from environment ---
+        // You should configure these in your Firebase environment
+        const projectId = process.env.GCLOUD_PROJECT;
+        // Example model, you can change it to the one that fits your needs
+        const modelId = "gemini-1.0-pro";
+        const apiEndpoint = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/us-central1/publishers/google/models/${modelId}:streamGenerateContent`;
+
+        // --- Construct the Prompt for Gemini ---
+        // This is a crucial step. A well-crafted prompt will yield better results.
+        const prompt = `
+            Analyze the following text from a user. Provide a structured JSON response.
+            Do not include any introductory text or markdown formatting in your response.
+            The JSON object must have the following keys:
+            1. "riskScore": An integer between 0 and 100 representing the cybersecurity risk (phishing, scam, malware link). 100 is the highest risk.
+            2. "sentiment": A single word string, which can be "Positive", "Negative", or "Neutral".
+            3. "summary": A brief, one-sentence summary in Spanish explaining the core message and the reason for the risk score.
+
+            Text to analyze: "${textToAnalyze}"
+        `;
+
+        // --- Prepare the API Request Payload ---
+        const requestBody = {
+            contents: [{
+                role: "user",
+                parts: [{ text: prompt }]
+            }],
+            generationConfig: {
+                // Tells the model to output a raw JSON string
+                responseMimeType: "application/json",
+            }
+        };
+
+        // --- Make the API Call ---
+        const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new functions.https.HttpsError('internal', `Gemini API Error: ${response.status} ${errorBody}`);
+        }
+        
+        const responseData = await response.json();
+
+        // Extract and parse the JSON content from the Gemini response
+        // The structure might vary slightly based on the model version.
+        if (responseData[0] && responseData[0].candidates[0] && responseData[0].candidates[0].content.parts[0].text) {
+             const resultText = responseData[0].candidates[0].content.parts[0].text;
+             const structuredResult = JSON.parse(resultText);
+
+            // Return the structured object to the client.
+            return structuredResult;
+        } else {
+             throw new functions.https.HttpsError('internal', 'Could not parse the response from Gemini API.');
+        }
+
+    } catch (error) {
+        console.error("Error in analyzeWithGemini function:", error);
+        // Throw a generic error to the client to avoid leaking implementation details.
+        throw new functions.https.HttpsError(
+            'internal',
+            'An unexpected error occurred while analyzing the text.'
+        );
+    }
+});
